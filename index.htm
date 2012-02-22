@@ -33,11 +33,11 @@ html, body {
 	overflow: auto;
 }
 body {
-	background: #004f8a;
+	background: #008a54;
 }
 #main {
 	position: relative;
-	background: url(bg.jpg) no-repeat;
+	background: #008a54 url(bg.jpg) no-repeat;
 	width: 950px;
 	height: 574px;
 	margin: 8px auto;
@@ -45,6 +45,12 @@ body {
 	font-size: 16px;
 	font-family: "monospace",monospace;
 	cursor: default;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-o-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 #statewrap {
 	background: url(machine.gif) no-repeat center center;
@@ -227,6 +233,21 @@ body.anim2 #tape span {
 	width: 64px;
 	height: 64px;
 	z-index: 4;
+}
+#fork-me-on-github {
+	background: url(https://a248.e.akamai.net/assets.github.com/img/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67) no-repeat;
+	width: 149px;
+	height: 149px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: 0;
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-o-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 </style>
 <script src="jquery.js"></script>
@@ -695,7 +716,7 @@ $(function($){
 </script>
 </head>
 <body>
-<a href="https://github.com/VittGam/JSTMSimulator"><img style="position:absolute;top:0;right:0;border:0" src="https://a248.e.akamai.net/assets.github.com/img/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub"></a>
+<a href="https://github.com/VittGam/JSTMSimulator" id="fork-me-on-github" title="Fork me on GitHub"></a>
 <div id="main">
 <div id="statewrap"><div id="state">0</div></div>
 <textarea id="code" wrap="off" autocomplete="off" disabled></textarea>
