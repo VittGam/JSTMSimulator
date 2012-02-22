@@ -1,6 +1,6 @@
 # JSTMSimulator
 
-A Turing Machine simulator written in JavaScript.
+A Turing Machine simulator written in JavaScript. It has been written from scratch and it's based on the design and functionality of the Java simulator developed by Antonio Cisternino (http://mdt.di.unipi.it/TMSimulatore/TMApplet.html)
 
 ## License
 
