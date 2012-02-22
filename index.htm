@@ -1,0 +1,736 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>JSTMSimulator v1.0 by VittGam</title>
+<style>
+html, body {
+	margin: 0;
+	padding: 0;
+	overflow: auto;
+}
+body {
+	background: #004f8a;
+}
+#main {
+	position: relative;
+	background: url(bg.jpg) no-repeat;
+	width: 950px;
+	height: 574px;
+	margin: 8px auto;
+	overflow: hidden;
+	font-size: 16px;
+	font-family: "monospace",monospace;
+	cursor: default;
+}
+#statewrap {
+	background: url(machine.gif) no-repeat center center;
+	position: relative;
+	left: 268px;
+	top: 136px;
+	width: 190px;
+	height: 175px;
+	z-index: 1;
+}
+#state {
+	position: absolute;
+	left: -4926px;
+	top: 50px;
+	width: 10000px;
+	height: 32px;
+	margin: 0 auto;
+	text-align: center;
+	font-size: 32px;
+	font-weight: bold;
+	white-space: nowrap;
+}
+#code {
+	position: absolute;
+	z-index: 4;
+	left: 720px;
+	top: 0;
+	width: 226px;
+	height: 568px; /*520px*/
+	overflow: scroll;
+	white-space: pre;
+	word-wrap: normal;
+	resize: none;
+	padding: 2px;
+	border: 0;
+}
+#status {
+	position: absolute;
+	z-index: 3;
+	left: 0;
+	top: 507px;
+	width: 716px;
+	height: 13px;
+	text-align: right;
+	color: white;
+	white-space: nowrap;
+	font: 13px arial,sans-serif;
+	font-weight: bold;
+	text-shadow: black 0 0 6px;
+}
+/*#progs {
+	position: absolute;
+	z-index: 4;
+	left: 720px;
+	top: 526px;
+	width: 230px;
+	height: 24px;
+}
+#loadbtn {
+	position: absolute;
+	z-index: 4;
+	left: 720px;
+	top: 550px;
+	width: 230px;
+	height: 24px;
+}*/
+#startbtn {
+	position: absolute;
+	z-index: 4;
+	left: 240px;
+	top: 526px;
+	width: 240px;
+	height: 24px;
+}
+#stopbtn {
+	position: absolute;
+	z-index: 4;
+	left: 480px;
+	top: 526px;
+	width: 240px;
+	height: 24px;
+}
+#speedlbl {
+	position: absolute;
+	z-index: 4;
+	left: 0;
+	top: 528px;
+	width: 70px;
+	height: 18px;
+	color: white;
+	font: 18px arial,sans-serif;
+}
+#speed {
+	position: absolute;
+	z-index: 4;
+	left: 70px;
+	top: 526px;
+	width: 170px;
+	height: 24px;
+}
+#input {
+	position: absolute;
+	z-index: 4;
+	left: 0;
+	top: 551px;
+	width: 716px;
+	height: 16px;
+}
+#tape {
+	background: url(tape.gif) no-repeat;
+	background-position: 50% 0%;
+	position: absolute;
+	z-index: 2;
+	left: 0;
+	top: 314px;
+	width: 720px;
+	height: 209px;
+}
+body.anim1 #tape {
+	background-position: 50% 100%;
+}
+body.anim2 #tape {
+	background-position: 50% 50%;
+}
+#tape span {
+	position: absolute;
+	font-weight: bold;
+	width: 10px;
+	height: 16px;
+}
+body.anim1 #tape span {
+	margin-left: 2px;
+}
+body.anim2 #tape span {
+	margin-left: -4px;
+}
+#tape span#cell0{left:156px;top:35px}
+#tape span#cell1{left:167px;top:36px}
+#tape span#cell2{left:181px;top:35px}
+#tape span#cell3{left:194px;top:35px}
+#tape span#cell4{left:208px;top:35px}
+#tape span#cell5{left:220px;top:35px}
+#tape span#cell6{left:232px;top:34px}
+#tape span#cell7{left:245px;top:34px}
+#tape span#cell8{left:259px;top:34px}
+#tape span#cell9{left:273px;top:34px}
+#tape span#cell10{left:288px;top:33px}
+#tape span#cell11{left:303px;top:32px}
+#tape span#cell12{left:318px;top:32px}
+#tape span#cell13{left:333px;top:32px}
+#tape span#cell14{left:347px;top:31px}
+#tape span#cell15{left:362px;top:31px;color:red}
+#tape span#cell16{left:376px;top:30px}
+#tape span#cell17{left:390px;top:30px}
+#tape span#cell18{left:404px;top:29px}
+#tape span#cell19{left:418px;top:29px}
+#tape span#cell20{left:433px;top:29px}
+#tape span#cell21{left:449px;top:29px}
+#tape span#cell22{left:465px;top:29px}
+#tape span#cell23{left:479px;top:28px}
+#tape span#cell24{left:493px;top:28px}
+#tape span#cell25{left:507px;top:28px}
+#tape span#cell26{left:519px;top:27px}
+#tape span#cell27{left:532px;top:27px}
+#tape span#cell28{left:546px;top:26px}
+#tape span#cell29{left:560px;top:27px}
+#tape span#cell30{left:576px;top:28px}
+#moveleft {
+	position: absolute;
+	left: 78px;
+	top: 326px;
+	width: 64px;
+	height: 64px;
+	z-index: 4;
+}
+#moveright {
+	position: absolute;
+	left: 587px;
+	top: 329px;
+	width: 64px;
+	height: 64px;
+	z-index: 4;
+}
+</style>
+<script src="jquery.js"></script>
+<!--script src="http://www.frequency-decoder.com/demo/slider-v2/slider.min.js"></script-->
+<script>
+$(function($){
+	var alphabet='!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^-{|}';
+	var input='';
+	var rules={};
+	var passcount=0;
+	var lastmove='-';
+	var statusTimeout=null;
+	var tapetext='';
+	var tapepos=0;
+	var currstate='0';
+	var currtickline=0;
+	var currclass=null;
+	var drawTimeout=null;
+	var tickTimeout=null;
+	var stopped=true;
+	var speed=750;
+	var setstatus=function(text,dontcancel){
+		clearTimeout(statusTimeout);
+		$('#status').text(text||'');
+		if (!dontcancel && text!=='') {
+			statusTimeout=setTimeout(function(){
+				$('#status').text('');
+			},5000);
+		}
+	};
+	var TMError=function(msg){
+		if (!(this instanceof TMError)) {
+			return new TMError(msg);
+		}
+		if (msg) {
+			this.message=msg;
+		}
+	};
+	TMError.prototype=new Error();
+	TMError.prototype.name='TMError';
+	TMError.toString=function(){return 'function TMError() { [native code] }'};
+	TMError.toString.toString=TMError.toString;
+	$.fn.textareaSelect=function(startpos,endpos){
+		this.filter('textarea').each(function(){
+			if (typeof startpos!='number' || startpos<0 || startpos>this.value.length) {
+				startpos=0;
+			}
+			if (typeof endpos!='number' || endpos>this.value.length) {
+				endpos=this.value.length;
+			}
+			if (endpos<=startpos) {
+				return;
+			}
+			if (startpos===0 && endpos===this.value.length) {
+				if (typeof this.select=='function'){
+					this.select();
+				}
+				return;
+			}
+			if (typeof this.createTextRange=='function') {
+				var range=this.createTextRange();
+				range.moveStart('character',startpos);
+				range.moveEnd('character',endpos-this.value.length);
+				range.select();
+				range=null;
+			} else if (typeof this.setSelectionRange=='function'){
+				this.setSelectionRange(startpos,endpos);
+			}
+		});
+	};
+	$.fn.textareaSelectLine=function(linenumber){
+		if (linenumber<0) {
+			return;
+		}
+		this.filter('textarea').each(function(){
+			var startpos=0;
+			var endpos=0;
+			for (var i=linenumber;i>0;i--) {
+				startpos=this.value.indexOf('\n',startpos)+1;
+				if (startpos===0) {
+					return;
+				}
+			}
+			endpos=this.value.indexOf('\n',startpos);
+			$(this).textareaSelect(startpos,endpos);
+		});
+	};
+	var drawtape=function(){
+		var redraw=false;
+		var oldclass=currclass;
+		if (currclass===0) {
+			currclass=(lastmove==='-' ? 3 : 1);
+		} else if (currclass===1) {
+			currclass=2;
+			redraw=true;
+		} else if (currclass===2) {
+			currclass=0;
+		} else if (currclass===3) {
+			currclass=4;
+			redraw=true;
+		} else if (currclass===4) {
+			currclass=0;
+		} else {
+			currclass=0;
+			redraw=true;
+		}
+		if (redraw) {
+			for (var i=0;i<31;i++) {
+				$('#cell'+i).text(tapetext.charAt(i+tapepos-15));
+			}
+			//$('#code').textareaSelectLine(currtickline); // FIXME buggy...
+			$('#state').text(currstate);
+			setstatus('Passi: '+passcount,true);
+		}
+		if (currclass!==oldclass) {
+			if (oldclass!==null) {
+				$('body').removeClass('anim'+oldclass);
+			}
+			$('body').addClass('anim'+currclass);
+		}
+		if (currclass===0 && stopped) {
+			input='';
+			rules={};
+			lastmove='-';
+			currclass=null;
+			setstatus('Fine della computazione. Passi: '+passcount,true);
+			$('#code').add('#input').add('#startbtn').attr('disabled',false);
+			return;
+		}
+		drawTimeout=setTimeout(drawtape,Math.max(speed/3,130));
+	};
+	var tick=function(){
+		if (stopped) {
+			return;
+		}
+		while (tapepos<0) {
+			tapetext=' '+tapetext;
+			tapepos++;
+		}
+		while (tapepos>=tapetext.length) {
+			tapetext=tapetext+' ';
+		}
+		var currchar=tapetext.charAt(tapepos);
+		if (!(rules[currstate] && rules[currstate][currchar])) {
+			stop();
+			currclass=null;
+			drawtape();
+			return;
+		}
+		tapetext=tapetext.substring(0,tapepos)+rules[currstate][currchar][1]+tapetext.substring(tapepos+1);
+		if (rules[currstate][currchar][2]==='<') {
+			lastmove='<';
+			tapepos--;
+		} else if (rules[currstate][currchar][2]==='>') {
+			lastmove='>';
+			tapepos++;
+		} else {
+			lastmove='-';
+		}
+		passcount++;
+		currtickline=rules[currstate][currchar][3];
+		currstate=rules[currstate][currchar][0];
+		tickTimeout=setTimeout(tick,speed);
+	};
+	var unescapedIndexOf=function(input,srch,startidx){
+		var output=(typeof startidx=='undefined' ? 0 : startidx)-1;
+		do {
+			output=input.indexOf(srch,output+1);
+		} while (input.charAt(output-1)==='\\' && input.charAt(output-2)!=='\\');
+		return output;
+	};
+	var getpart=function(grplength,currtype){
+		var openpIdx=unescapedIndexOf(input,'(');
+		if (currtype===4) { // parsing movement, it's the last part of the 5-uple
+			var commaIdx=unescapedIndexOf(input,')');
+			var closeIdx=-1;
+		} else {
+			var commaIdx=unescapedIndexOf(input,',');
+			var closeIdx=unescapedIndexOf(input,')');
+		}
+		var nlineIdx=input.indexOf('\n');
+		if (openpIdx!==-1 && openpIdx<commaIdx) {
+			throw new TMError('Era attesa la "," come separatore');
+		} else if (closeIdx!==-1 && closeIdx<commaIdx) {
+			throw new TMError('Era attesa la "," come separatore');
+		} else if (nlineIdx!==-1 && nlineIdx<commaIdx) {
+			throw new TMError('Era attesa la "," come separatore');
+		}
+		var part=input.substring(0,commaIdx).replace(new RegExp('^\\s\\s*'),'').replace(new RegExp('\\s\\s*$'),'');
+		input=input.substring(commaIdx+1);
+		if (part==='') {
+			if (currtype===0) {
+				throw new TMError('Errore nella lettura dello stato di partenza');
+			} else if (currtype===1) {
+				throw new TMError('Errore nella lettura del simbolo da leggere');
+			} else if (currtype===2) {
+				throw new TMError('Errore nella lettura dello stato di destinazione');
+			} else if (currtype===3) {
+				throw new TMError('Errore nella lettura del simbolo da scrivere');
+			} else if (currtype===4) {
+				throw new TMError('Errore nella lettura del movimento da eseguire');
+			}
+			throw new TMError('Errore nella lettura'); // this shouldn't ever happen...
+		}
+		var open1Idx=unescapedIndexOf(part,'[');
+		var clos1Idx=unescapedIndexOf(part,']');
+		var open2Idx=unescapedIndexOf(part,'{');
+		var clos2Idx=unescapedIndexOf(part,'}');
+		var caretIdx=unescapedIndexOf(part,'^');
+		if (open1Idx!==-1) {
+			if (clos1Idx===-1 || open2Idx!==-1 || clos2Idx!==-1) {
+				throw new TMError('Le classi di caratteri nella regola hanno lunghezze differenti');
+			}
+			if (caretIdx!==-1 && caretIdx!==open1Idx+1) {
+				throw new TMError('Era attesa la "," come separatore');
+			}
+			if (currtype!==0 && currtype!==2 &&  ((open1Idx!==0) || (clos1Idx!==part.length-1))) {
+				throw new TMError('Era attesa la "," come separatore');
+			}
+			return parsegroup(0,grplength,part.substring(open1Idx+1,clos1Idx),part.substring(0,open1Idx),part.substring(clos1Idx+1));
+		} else if (open2Idx!==-1) {
+			if (clos2Idx===-1 || open1Idx!==-1 || clos1Idx!==-1) {
+				throw new TMError('Le classi di caratteri nella regola hanno lunghezze differenti');
+			}
+			if (caretIdx!==-1 && caretIdx!==open2Idx+1) {
+				throw new TMError('Era attesa la "," come separatore');
+			}
+			if (currtype!==0 && currtype!==2 && ((open2Idx!==0) || (clos2Idx!==part.length-1))) {
+				throw new TMError('Era attesa la "," come separatore');
+			}
+			return parsegroup(1,grplength,part.substring(open2Idx+1,clos2Idx),part.substring(0,open2Idx),part.substring(clos2Idx+1));
+		}
+		if (currtype!==0 && currtype!==2) { // not the states
+			return parsegroup((part.length>1 ? 2 : 3),grplength,part,'','');
+		}
+		return part;
+	};
+	var checkforgroup=function(checkme,currline,readstate,readtape,writestate,writetape,movement){
+		if (checkme instanceof Array) {
+			for (var i=1;i<checkme.length;i++) {
+				addrule(currline,
+					(readstate instanceof Array && readstate[0]===checkme[0] ? readstate[i] : readstate),
+					(readtape instanceof Array && readtape[0]===checkme[0] ? readtape[i] : readtape),
+					(writestate instanceof Array && writestate[0]===checkme[0] ? writestate[i] : writestate),
+					(writetape instanceof Array && writetape[0]===checkme[0] ? writetape[i] : writetape),
+					(movement instanceof Array && movement[0]===checkme[0] ? movement[i] : movement));
+			}
+			return true;
+		}
+		return false;
+	};
+	var addrule=function(currline,readstate,readtape,writestate,writetape,movement){
+		if (checkforgroup(readstate,currline,readstate,readtape,writestate,writetape,movement)) {
+			return;
+		}
+		if (checkforgroup(readtape,currline,readstate,readtape,writestate,writetape,movement)) {
+			return;
+		}
+		if (checkforgroup(writestate,currline,readstate,readtape,writestate,writetape,movement)) {
+			return;
+		}
+		if (checkforgroup(writetape,currline,readstate,readtape,writestate,writetape,movement)) {
+			return;
+		}
+		if (checkforgroup(movement,currline,readstate,readtape,writestate,writetape,movement)) {
+			return;
+		}
+		if (movement!=='<' && movement!=='>' && movement!==' ') {
+			throw new TMError('Lo spostamento non è corretto');
+		}
+		if (!rules[readstate]) {
+			rules[readstate]={};
+		}
+		rules[readstate][readtape]=[writestate,writetape,movement,currline];
+	};
+	var parsegroup=function(grpid,grplength,group,prefix,suffix){
+		var outarray=[];
+		var reversematch=false;
+		if (group.charAt(0)==='^') {
+			reversematch=true;
+			group=group.substring(1);
+			var prefix2=prefix;
+			var suffix2=suffix;
+			prefix=suffix='';
+			if (grpid===3) {
+				grpid=2;
+			}
+		}
+		while (group.length) {
+			if (group.charAt(0)==='\\') {
+				outarray.push(prefix+group.charAt(1)+suffix);
+				group=group.substring(2);
+			} else if (group.charAt(0)==='-') {
+				outarray.push(prefix+' '+suffix);
+				group=group.substring(1);
+			} else if (group.substr(1,2)==='..' && group.charAt(group.charAt(3)==='\\' ? 4 : 3)!=='') {
+				var startchar=group.charAt(0);
+				var stopchar=group.charAt(3);
+				if (stopchar==='\\') {
+					stopchar=group.charAt(4);
+					group=group.substring(1);
+				}
+				group=group.substring(4);
+				if (alphabet.indexOf(startchar)>alphabet.indexOf(stopchar)) {
+					for (var i=alphabet.indexOf(stopchar);i<=alphabet.indexOf(startchar);i++) {
+						outarray.push(prefix+alphabet[i]+suffix);
+					}
+				} else {
+					for (var i=alphabet.indexOf(startchar);i<=alphabet.indexOf(stopchar);i++) {
+						outarray.push(prefix+alphabet[i]+suffix);
+					}
+				}
+			} else {
+				outarray.push(prefix+group.charAt(0)+suffix);
+				group=group.substring(1);
+			}
+		}
+		if (reversematch) {
+			var newoutarray=[];
+			var alphasplit=alphabet.split('');
+			for (var i=0;i<alphasplit.length;i++) {
+				if ($.inArray(alphasplit[i],outarray)===-1) {
+					newoutarray.push(prefix2+alphasplit[i]+suffix2);
+				}
+			};
+			if ($.inArray(' ',outarray)===-1) {
+				newoutarray.push(prefix2+' '+suffix2);
+			}
+			outarray=newoutarray;
+		}
+		if (outarray.length===1) {
+			grpid=3;
+		}
+		if (outarray.length<1) {
+			throw new TMError('Una delle classi di caratteri nella regola è vuota');
+		} else if (grplength[grpid] && grplength[grpid]!==outarray.length) {
+			throw new TMError('Le classi di caratteri nella regola hanno lunghezze differenti');
+		}
+		grplength[grpid]=outarray.length;
+		outarray.unshift(grpid);
+		return outarray;
+	};
+	var start=function(){
+		$('#code').add('#input').add('#startbtn').attr('disabled',true);
+		try {
+			input=String($('#code').val()).toUpperCase().replace(new RegExp('(?:\r\n|\r)','g'),'\n');
+			rules={};
+			passcount=0;
+			lastmove='-';
+			tapetext=String($('#input').val()).toUpperCase();
+			tapepos=0;
+			currstate='0';
+			currtickline=0;
+			currclass=null;
+			drawTimeout=null;
+			tickTimeout=null;
+			stopped=false;
+			setstatus();
+			var currline=0;
+			var exitloop=false;
+			while (!exitloop) {
+				switch (input.substr(0,1)) {
+					case '':
+						exitloop=true;
+						break;
+					case '#':
+						currline++;
+						if (input.indexOf('\n')===-1) {
+							input='';
+							exitloop=true;
+						} else {
+							input=input.substring(input.indexOf('\n')+1);
+						}
+						break;
+					case '\n':
+						currline++;
+					case ' ':
+						input=input.substring(1);
+						break;
+					case '(':
+						input=input.substring(1);
+						var grplength={};
+						var readstate=getpart(grplength,0);
+						var readtape=getpart(grplength,1);
+						var writestate=getpart(grplength,2);
+						var writetape=getpart(grplength,3);
+						var movement=getpart(grplength,4);
+						addrule(currline,readstate,readtape,writestate,writetape,movement);
+						break;
+					default:
+						throw new TMError('Fine inattesa della regola');
+				}
+			}
+			//console.log(rules);
+			$('#stopbtn').attr('disabled',false);
+			setspeed();
+			drawtape();
+			tick();
+		} catch (e) {
+			input='';
+			rules={};
+			lastmove='-';
+			currclass=null;
+			$('#code').textareaSelectLine(currline);
+			setstatus((e instanceof TMError ? 'Errore di sintassi (linea '+(currline+1)+'): '+e.message : 'Errore: '+(e.message||e)));
+			stop();
+			$('#code').add('#input').add('#startbtn').attr('disabled',false);
+		}
+	};
+	var setspeed=function(){
+		var currval=$('#speed').val();
+		if (currval<1) {
+			speed=1500;
+		} else if (currval==1) {
+			speed=1350;
+		} else if (currval==2) {
+			speed=1200;
+		} else if (currval==3) {
+			speed=1050;
+		} else if (currval==4) {
+			speed=900;
+		} else if (currval==5) {
+			speed=750;
+		} else if (currval==6) {
+			speed=600;
+		} else if (currval==7) {
+			speed=450;
+		} else if (currval==8) {
+			speed=300;
+		} else if (currval==9) {
+			speed=150;
+		} else {
+			speed=0;
+		}
+	};
+	var stop=function(){
+		if (stopped) {
+			return;
+		}
+		$('#stopbtn').attr('disabled',true);
+		drawTimeout=null;
+		tickTimeout=null;
+		stopped=true;
+		clearTimeout(tickTimeout);
+	};
+	$('#statewrap').add('#startbtn').add('#stopbtn').add('#speedlbl').add('#speed').add('#status').add('#tape').add('#moveleft').add('#moveright').bind(("onselectstart" in document.body ? 'selectstart' : 'mousedown'),function(e){e.preventDefault()});
+	$('#startbtn').click(start);
+	$('#stopbtn').click(stop);
+	$('#moveleft').click(function(){
+		if (!$('#startbtn').attr('disabled')) {
+			tapepos++;
+			currclass=null;
+			drawtape();
+		}
+	});
+	$('#moveright').click(function(){
+		if (!$('#startbtn').attr('disabled')) {
+			tapepos--;
+			currclass=null;
+			drawtape();
+		}
+	});
+	$('#speed').change(function(e,v){setspeed()});
+	$('#code').add('#input').add('#speed').add('#startbtn').attr('disabled',false);
+});
+</script>
+</head>
+<body>
+<div id="main">
+<div id="statewrap"><div id="state">0</div></div>
+<textarea id="code" wrap="off" autocomplete="off" disabled></textarea>
+<!--select id="progs" autocomplete="off" disabled><option>Hello world</option></select-->
+<!--input type="button" id="loadbtn" value="Carica" disabled-->
+<input type="button" id="startbtn" value="Esegui" disabled>
+<input type="button" id="stopbtn" value="Stop" disabled>
+<!--input type="range" id="speed" min="0" max="10" value="5" step="1" autocomplete="off" disabled-->
+<span id="speedlbl">Velocità:</span>
+<select id="speed" autocomplete="off" disabled class="fd_hide_input fd_tween">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5" selected>5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+</select>
+<input type="text" id="input" autocomplete="off" value="" disabled>
+<div id="status">JSTMSimulator v1.0 by VittGam</div>
+<div id="tape">
+<span id="cell0"></span>
+<span id="cell1"></span>
+<span id="cell2"></span>
+<span id="cell3"></span>
+<span id="cell4"></span>
+<span id="cell5"></span>
+<span id="cell6"></span>
+<span id="cell7"></span>
+<span id="cell8"></span>
+<span id="cell9"></span>
+<span id="cell10"></span>
+<span id="cell11"></span>
+<span id="cell12"></span>
+<span id="cell13"></span>
+<span id="cell14"></span>
+<span id="cell15"></span>
+<span id="cell16"></span>
+<span id="cell17"></span>
+<span id="cell18"></span>
+<span id="cell19"></span>
+<span id="cell20"></span>
+<span id="cell21"></span>
+<span id="cell22"></span>
+<span id="cell23"></span>
+<span id="cell24"></span>
+<span id="cell25"></span>
+<span id="cell26"></span>
+<span id="cell27"></span>
+<span id="cell28"></span>
+<span id="cell29"></span>
+<span id="cell30"></span>
+</div>
+<div id="moveleft"></div>
+<div id="moveright"></div>
+</div>
+</body>
+</html>
