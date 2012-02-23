@@ -169,10 +169,10 @@ body {
 	width: 720px;
 	height: 209px;
 }
-body.anim1 #tape {
+#main.anim1 #tape {
 	background-position: 50% 100%;
 }
-body.anim2 #tape {
+#main.anim2 #tape {
 	background-position: 50% 50%;
 }
 #tape span {
@@ -181,10 +181,10 @@ body.anim2 #tape {
 	width: 10px;
 	height: 16px;
 }
-body.anim1 #tape span {
+#main.anim1 #tape span {
 	margin-left: 2px;
 }
-body.anim2 #tape span {
+#main.anim2 #tape span {
 	margin-left: -4px;
 }
 #tape span#cell0{left:156px;top:35px}
@@ -363,10 +363,7 @@ $(function($){
 			setstatus('Passi: '+passcount,true);
 		}
 		if (currclass!==oldclass) {
-			if (oldclass!==null) {
-				$('body').removeClass('anim'+oldclass);
-			}
-			$('body').addClass('anim'+currclass);
+			$('#main').toggleClass('anim0',currclass===0).toggleClass('anim1',currclass===1).toggleClass('anim2',currclass===2).toggleClass('anim3',currclass===3).toggleClass('anim4',currclass===4);
 		}
 		if (currclass===0 && stopped) {
 			input='';
