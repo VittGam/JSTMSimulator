@@ -455,24 +455,42 @@ $(function($){
 		var clos2Idx=unescapedIndexOf(part,'}');
 		var caretIdx=unescapedIndexOf(part,'^');
 		if (open1Idx!==-1) {
-			if (clos1Idx===-1 || open2Idx!==-1 || clos2Idx!==-1) {
+			if (clos1Idx===-1) {
 				throw new TMError('Le classi di caratteri nella regola hanno lunghezze differenti');
+			}
+			if (open2Idx!==-1 || clos2Idx!==-1) {
+				throw new TMError('Era attesa la "," come separatore');
 			}
 			if (caretIdx!==-1 && caretIdx!==open1Idx+1) {
 				throw new TMError('Era attesa la "," come separatore');
 			}
-			if (currtype!==0 && currtype!==2 &&  ((open1Idx!==0) || (clos1Idx!==part.length-1))) {
+			if (currtype!==0 && currtype!==2 && ((open1Idx!==0) || (clos1Idx!==part.length-1))) {
+				throw new TMError('Era attesa la "," come separatore');
+			}
+			if ((currtype===0 || currtype===2) && unescapedIndexOf(part,'[',open1Idx+1)!==-1) {
+				throw new TMError('Era attesa la "," come separatore');
+			}
+			if ((currtype===0 || currtype===2) && unescapedIndexOf(part,']',clos1Idx+1)!==-1) {
 				throw new TMError('Era attesa la "," come separatore');
 			}
 			return parsegroup(0,grplength,part.substring(open1Idx+1,clos1Idx),part.substring(0,open1Idx),part.substring(clos1Idx+1));
 		} else if (open2Idx!==-1) {
-			if (clos2Idx===-1 || open1Idx!==-1 || clos1Idx!==-1) {
+			if (clos2Idx===-1) {
 				throw new TMError('Le classi di caratteri nella regola hanno lunghezze differenti');
+			}
+			if (open1Idx!==-1 || clos1Idx!==-1) {
+				throw new TMError('Era attesa la "," come separatore');
 			}
 			if (caretIdx!==-1 && caretIdx!==open2Idx+1) {
 				throw new TMError('Era attesa la "," come separatore');
 			}
 			if (currtype!==0 && currtype!==2 && ((open2Idx!==0) || (clos2Idx!==part.length-1))) {
+				throw new TMError('Era attesa la "," come separatore');
+			}
+			if ((currtype===0 || currtype===2) && unescapedIndexOf(part,'{',open2Idx+1)!==-1) {
+				throw new TMError('Era attesa la "," come separatore');
+			}
+			if ((currtype===0 || currtype===2) && unescapedIndexOf(part,'}',clos2Idx+1)!==-1) {
 				throw new TMError('Era attesa la "," come separatore');
 			}
 			return parsegroup(1,grplength,part.substring(open2Idx+1,clos2Idx),part.substring(0,open2Idx),part.substring(clos2Idx+1));
