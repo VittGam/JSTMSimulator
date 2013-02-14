@@ -37,7 +37,7 @@ body {
 	background: #008b54;
 }
 #main, #tape {
-	background: url(/home/vittgam/Immagini/jstmsimulator.gif) no-repeat;
+	background: url(jstmsimulator.gif) no-repeat;
 }
 #main {
 	position: relative;
@@ -869,7 +869,7 @@ body {
 	var preventSelectTo=[stateDiv,startBtn,stopBtn,speedLabel,speedSelect,statusDiv,tapeDiv,moveLeftBtn,moveRightBtn];
 	var selectPreventerEvent=('onselectstart' in document.body ? 'selectstart' : 'mousedown');
 	for (var i=0;i<preventSelectTo.length;i++) {
-		addEvent(preventSelectTo[i],selectPreventerEvent,function(e){e.preventDefault();return false});
+		addEvent(preventSelectTo[i],selectPreventerEvent,function(e){if(!e)e=window.event;if(e.preventDefault)e.preventDefault();return false});
 	}
 	preventSelectTo=selectPreventerEvent=null;
 	addEvent(startBtn,'click',start);
