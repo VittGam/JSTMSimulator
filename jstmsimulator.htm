@@ -164,10 +164,10 @@ body {
 	width: 720px;
 	height: 209px;
 }
-#main.anim1 #tape {
+#tape.anim1 {
 	background-position: 0 -418px;
 }
-#main.anim2 #tape {
+#tape.anim2 {
 	background-position: 0 -209px;
 }
 #tape span {
@@ -176,10 +176,10 @@ body {
 	width: 10px;
 	height: 16px;
 }
-#main.anim1 #tape span {
+#tape.anim1 span {
 	margin-left: 2px;
 }
-#main.anim2 #tape span {
+#tape.anim2 span {
 	margin-left: -4px;
 }
 #tape span#cell0{left:156px;top:35px}
@@ -515,7 +515,7 @@ body {
 			setstatus('Passi: '+passcount,true);
 		}
 		if (currclass!==oldclass) {
-			mainDiv.className=((currclass===1 || currclass===2) ? 'anim'+currclass : '');
+			tapeDiv.className=((currclass===1 || currclass===2) ? 'anim'+currclass : '');
 		}
 		if (currclass===0 && stopped) {
 			input='';
