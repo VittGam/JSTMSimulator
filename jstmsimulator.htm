@@ -373,7 +373,7 @@ body {
 	var alphabet='!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^-{|}';
 	var input='';
 	var rules={};
-	var passcount=0;
+	var stepcount=0;
 	var lastmove='-';
 	var statusTimeout=null;
 	var tapetext='';
@@ -512,7 +512,7 @@ body {
 			}
 			//textareaSelectLine(codeTextarea,currtickline); // FIXME buggy...
 			setTextContent(stateDiv,currstate);
-			setstatus('Passi: '+passcount,true);
+			setstatus('Passi: '+stepcount,true);
 		}
 		if (currclass!==oldclass) {
 			tapeDiv.className=((currclass===1 || currclass===2) ? 'anim'+currclass : '');
@@ -522,7 +522,7 @@ body {
 			rules={};
 			lastmove='-';
 			currclass=null;
-			setstatus('Fine della computazione. Passi: '+passcount,true);
+			setstatus('Fine della computazione. Passi: '+stepcount,true);
 			codeTextarea.disabled=inputBox.disabled=startBtn.disabled=false;
 			return;
 		}
@@ -556,7 +556,7 @@ body {
 		} else {
 			lastmove='-';
 		}
-		passcount++;
+		stepcount++;
 		currtickline=rules[currstate][currchar][3];
 		currstate=rules[currstate][currchar][0];
 		tickTimeout=setTimeout(tick,speed);
@@ -769,7 +769,7 @@ body {
 		try {
 			input=String(codeTextarea.value).toUpperCase().replace(new RegExp('(?:\r\n|\r)','g'),'\n');
 			rules={};
-			passcount=0;
+			stepcount=0;
 			lastmove='-';
 			tapetext=String(inputBox.value).toUpperCase();
 			tapepos=0;
