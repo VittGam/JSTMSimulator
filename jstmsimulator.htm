@@ -1,7 +1,7 @@
 <!doctype html>
 <!--
-JSTMSimulator v1.0 - A Turing Machine simulator written in JavaScript.
-Copyright (C) 2012 VittGam.net. All Rights Reserved.
+JSTMSimulator - A Turing Machine simulator written in JavaScript.
+Copyright (C) 2013 VittGam.net. All Rights Reserved.
 https://server1.vittgam.net/jstmsimulator/
 https://github.com/VittGam/JSTMSimulator
 
@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 <html>
 <head>
 <meta charset="utf-8">
-<title>JSTMSimulator v1.0 by VittGam</title>
+<title>JSTMSimulator by VittGam</title>
 <style>
 html, body {
 	margin: 0;
@@ -33,11 +33,15 @@ html, body {
 	overflow: auto;
 }
 body {
-	background: #008a54;
+	font: 15px arial,sans-serif;
+	background: #008b54;
+}
+#main, #tape {
+	background: url(/home/vittgam/Immagini/jstmsimulator.gif) no-repeat;
 }
 #main {
 	position: relative;
-	background: #008a54 url(bg.jpg) no-repeat;
+	background-position: -720px 0;
 	width: 950px;
 	height: 574px;
 	margin: 8px auto;
@@ -52,26 +56,18 @@ body {
 	-ms-user-select: none;
 	user-select: none;
 }
-#statewrap {
-	background: url(machine.gif) no-repeat center center;
-	position: relative;
-	left: 268px;
-	top: 136px;
-	width: 190px;
-	height: 175px;
-	z-index: 1;
-}
 #state {
 	position: absolute;
-	left: -4926px;
-	top: 50px;
-	width: 10000px;
+	left: 0;
+	top: 186px;
+	width: 684px;
 	height: 32px;
 	margin: 0 auto;
 	text-align: center;
 	font-size: 32px;
 	font-weight: bold;
 	white-space: nowrap;
+	z-index: 1;
 }
 #code {
 	position: absolute;
@@ -160,8 +156,7 @@ body {
 	height: 16px;
 }
 #tape {
-	background: url(tape.gif) no-repeat;
-	background-position: 50% 0%;
+	background-position: 0 0;
 	position: absolute;
 	z-index: 2;
 	left: 0;
@@ -170,10 +165,10 @@ body {
 	height: 209px;
 }
 #main.anim1 #tape {
-	background-position: 50% 100%;
+	background-position: 0 -418px;
 }
 #main.anim2 #tape {
-	background-position: 50% 50%;
+	background-position: 0 -209px;
 }
 #tape span {
 	position: absolute;
@@ -234,26 +229,146 @@ body {
 	height: 64px;
 	z-index: 4;
 }
+#noscript-alert {
+	color: red;
+	font-size: 40px;
+	font-weight: bold;
+	text-align: center;
+	margin: 20px auto;
+	padding: 20px;
+	width: 910px;
+	border: 4px dashed red;
+	border-radius: 20px;
+}
+/* The fork-me-on-github CSS badge code has been adapted from https://github.com/simonwhitaker/github-fork-ribbon-css */
 #fork-me-on-github {
-	background: url(https://a248.e.akamai.net/assets.github.com/img/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67) no-repeat;
-	width: 149px;
-	height: 149px;
+	width: 150px;
+	height: 150px;
 	position: absolute;
+	overflow: hidden;
 	top: 0;
 	right: 0;
-	border: 0;
 	-moz-user-select: -moz-none;
 	-khtml-user-select: none;
 	-webkit-user-select: none;
 	-o-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	z-index: 0;
+}
+#fork-me-on-github div {
+	position: absolute;
+	padding: 2px 0;
+	background-color: #a00;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.00)), to(rgba(0, 0, 0, 0.15)));
+	background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
+	background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
+	background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
+	background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
+	background-image: linear-gradient(top, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.15));
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#000000', EndColorStr='#000000');
+	-webkit-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.5);
+	box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.5);
+	z-index: 9999;
+	top: 42px;
+	right: -43px;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+#fork-me-on-github div a {
+	font-family: arial,sans-serif;
+	font-size: 13px;
+	font-weight: 700;
+	color: white;
+	text-decoration: none;
+	text-shadow: 0 -1px rgba(0,0,0,0.5);
+	text-align: center;
+	width: 200px;
+	line-height: 20px;
+	display: inline-block;
+	padding: 2px 0;
+	border-width: 1px 0;
+	border-style: dotted;
+	border-color: rgba(255,255,255,0.7);
 }
 </style>
-<script src="jquery.js"></script>
-<!--script src="http://www.frequency-decoder.com/demo/slider-v2/slider.min.js"></script-->
+<!--[if IE]>
+<style>
+#fork-me-on-github div {
+	top: -22px;
+	right: -62px;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.7071067811865474, M12=-0.7071067811865477, M21=0.7071067811865477, M22=0.7071067811865474, SizingMethod='auto expand')";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.7071067811865474, M12=-0.7071067811865477, M21=0.7071067811865477, M22=0.7071067811865474, SizingMethod='auto expand');
+}
+</style>
+<![endif]-->
+</head>
+<body>
+<div id="fork-me-on-github"><div><a href="https://github.com/VittGam/JSTMSimulator">Fork me on GitHub</a></div></div>
+<noscript><div id="noscript-alert">Please enable JavaScript in your browser.</div></noscript>
+<div id="main">
+<div id="state">0</div>
+<textarea id="code" wrap="off" autocomplete="off" disabled></textarea>
+<!--select id="progs" autocomplete="off" disabled><option>Hello world</option></select-->
+<!--input type="button" id="loadbtn" value="Carica" disabled-->
+<input type="button" id="startbtn" value="Esegui" disabled>
+<input type="button" id="stopbtn" value="Stop" disabled>
+<span id="speedlbl">Velocità:</span>
+<select id="speed" autocomplete="off" disabled>
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5" selected>5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+</select>
+<input type="text" id="input" autocomplete="off" value="" disabled>
+<div id="status">JSTMSimulator by VittGam</div>
+<div id="tape">
+<span id="cell0"></span>
+<span id="cell1"></span>
+<span id="cell2"></span>
+<span id="cell3"></span>
+<span id="cell4"></span>
+<span id="cell5"></span>
+<span id="cell6"></span>
+<span id="cell7"></span>
+<span id="cell8"></span>
+<span id="cell9"></span>
+<span id="cell10"></span>
+<span id="cell11"></span>
+<span id="cell12"></span>
+<span id="cell13"></span>
+<span id="cell14"></span>
+<span id="cell15"></span>
+<span id="cell16"></span>
+<span id="cell17"></span>
+<span id="cell18"></span>
+<span id="cell19"></span>
+<span id="cell20"></span>
+<span id="cell21"></span>
+<span id="cell22"></span>
+<span id="cell23"></span>
+<span id="cell24"></span>
+<span id="cell25"></span>
+<span id="cell26"></span>
+<span id="cell27"></span>
+<span id="cell28"></span>
+<span id="cell29"></span>
+<span id="cell30"></span>
+</div>
+<div id="moveleft"></div>
+<div id="moveright"></div>
+</div>
 <script>
-$(function($){
+(function(){
 	var alphabet='!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^-{|}';
 	var input='';
 	var rules={};
@@ -269,12 +384,35 @@ $(function($){
 	var tickTimeout=null;
 	var stopped=true;
 	var speed=750;
+
+	var mainDiv=document.getElementById('main');
+	var statusDiv=document.getElementById('status');
+	var stateDiv=document.getElementById('state');
+	var codeTextarea=document.getElementById('code');
+	var inputBox=document.getElementById('input');
+	var tapeDiv=document.getElementById('tape');
+	var speedLabel=document.getElementById('speedlbl');
+	var speedSelect=document.getElementById('speed');
+	var startBtn=document.getElementById('startbtn');
+	var stopBtn=document.getElementById('stopbtn');
+	var moveLeftBtn=document.getElementById('moveleft');
+	var moveRightBtn=document.getElementById('moveright');
+	var cells=[];
+	for (var i=0;i<31;i++) cells[i]=document.getElementById('cell'+i);
+
+	var textContentProp=('textContent' in document.body ? 'textContent' : 'innerText');
+	var setTextContent=function(div,text){
+		if (div) {
+			div[textContentProp]=text;
+		}
+	};
+
 	var setstatus=function(text,dontcancel){
 		clearTimeout(statusTimeout);
-		$('#status').text(text||'');
+		setTextContent(statusDiv,text||'');
 		if (!dontcancel && text!=='') {
 			statusTimeout=setTimeout(function(){
-				$('#status').text('');
+				setTextContent(statusDiv,'');
 			},5000);
 		}
 	};
@@ -290,50 +428,63 @@ $(function($){
 	TMError.prototype.name='TMError';
 	TMError.toString=function(){return 'function TMError() { [native code] }'};
 	TMError.toString.toString=TMError.toString;
-	$.fn.textareaSelect=function(startpos,endpos){
-		this.filter('textarea').each(function(){
-			if (typeof startpos!='number' || startpos<0 || startpos>this.value.length) {
-				startpos=0;
-			}
-			if (typeof endpos!='number' || endpos>this.value.length) {
-				endpos=this.value.length;
-			}
-			if (endpos<=startpos) {
-				return;
-			}
-			if (startpos===0 && endpos===this.value.length) {
-				if (typeof this.select=='function'){
-					this.select();
-				}
-				return;
-			}
-			if (typeof this.createTextRange=='function') {
-				var range=this.createTextRange();
-				range.moveStart('character',startpos);
-				range.moveEnd('character',endpos-this.value.length);
-				range.select();
-				range=null;
-			} else if (typeof this.setSelectionRange=='function'){
-				this.setSelectionRange(startpos,endpos);
-			}
-		});
+	var addEvent=function(elm,evt,func){
+		if (elm.addEventListener) {
+			elm.addEventListener(evt,func,false);
+		} else if (elm.attachEvent) {
+			elm.attachEvent('on'+(evt=='input' ? 'propertychange' : evt),func);
+		}
 	};
-	$.fn.textareaSelectLine=function(linenumber){
+	var inArray=function(currarray,elm){
+		if (currarray) {
+			for (var i=0;i<currarray.length;i++) {
+				if (i in currarray && currarray[i]===elm) {
+					return i;
+				}
+			}
+		}
+		return -1;
+	};
+	var textareaSelect=function(currtextarea,startpos,endpos){
+		if (typeof startpos!='number' || startpos<0 || startpos>currtextarea.value.length) {
+			startpos=0;
+		}
+		if (typeof endpos!='number' || endpos>currtextarea.value.length) {
+			endpos=currtextarea.value.length;
+		}
+		if (endpos<=startpos) {
+			return;
+		}
+		if (startpos===0 && endpos===currtextarea.value.length) {
+			if (typeof currtextarea.select=='function'){
+				currtextarea.select();
+			}
+			return;
+		}
+		if (typeof currtextarea.createTextRange=='function') {
+			var range=currtextarea.createTextRange();
+			range.moveStart('character',startpos);
+			range.moveEnd('character',endpos-currtextarea.value.length);
+			range.select();
+			range=null;
+		} else if (typeof currtextarea.setSelectionRange=='function'){
+			currtextarea.setSelectionRange(startpos,endpos);
+		}
+	};
+	var textareaSelectLine=function(currtextarea,linenumber){
 		if (linenumber<0) {
 			return;
 		}
-		this.filter('textarea').each(function(){
-			var startpos=0;
-			var endpos=0;
-			for (var i=linenumber;i>0;i--) {
-				startpos=this.value.indexOf('\n',startpos)+1;
-				if (startpos===0) {
-					return;
-				}
+		var startpos=0;
+		var endpos=0;
+		for (var i=linenumber;i>0;i--) {
+			startpos=currtextarea.value.indexOf('\n',startpos)+1;
+			if (startpos===0) {
+				return;
 			}
-			endpos=this.value.indexOf('\n',startpos);
-			$(this).textareaSelect(startpos,endpos);
-		});
+		}
+		endpos=currtextarea.value.indexOf('\n',startpos);
+		textareaSelect(currtextarea,startpos,endpos);
 	};
 	var drawtape=function(){
 		var redraw=false;
@@ -356,14 +507,14 @@ $(function($){
 		}
 		if (redraw) {
 			for (var i=0;i<31;i++) {
-				$('#cell'+i).text(tapetext.charAt(i+tapepos-15));
+				setTextContent(cells[i],tapetext.charAt(i+tapepos-15));
 			}
-			//$('#code').textareaSelectLine(currtickline); // FIXME buggy...
-			$('#state').text(currstate);
+			//textareaSelectLine(codeTextarea,currtickline); // FIXME buggy...
+			setTextContent(stateDiv,currstate);
 			setstatus('Passi: '+passcount,true);
 		}
 		if (currclass!==oldclass) {
-			$('#main').toggleClass('anim0',currclass===0).toggleClass('anim1',currclass===1).toggleClass('anim2',currclass===2).toggleClass('anim3',currclass===3).toggleClass('anim4',currclass===4);
+			mainDiv.className=((currclass===0 || currclass===1 || currclass===2 || currclass===3 || currclass===4) ? 'anim'+currclass : '');
 		}
 		if (currclass===0 && stopped) {
 			input='';
@@ -371,7 +522,7 @@ $(function($){
 			lastmove='-';
 			currclass=null;
 			setstatus('Fine della computazione. Passi: '+passcount,true);
-			$('#code').add('#input').add('#startbtn').attr('disabled',false);
+			codeTextarea.disabled=inputBox.disabled=startBtn.disabled=false;
 			return;
 		}
 		drawTimeout=setTimeout(drawtape,Math.max(speed/3,130));
@@ -584,11 +735,11 @@ $(function($){
 			var newoutarray=[];
 			var alphasplit=alphabet.split('');
 			for (var i=0;i<alphasplit.length;i++) {
-				if ($.inArray(alphasplit[i],outarray)===-1) {
+				if (inArray(outarray,alphasplit[i])===-1) {
 					newoutarray.push(prefix2+alphasplit[i]+suffix2);
 				}
 			};
-			if ($.inArray(' ',outarray)===-1) {
+			if (inArray(outarray,' ')===-1) {
 				newoutarray.push(prefix2+' '+suffix2);
 			}
 			outarray=newoutarray;
@@ -605,14 +756,21 @@ $(function($){
 		outarray.unshift(grpid);
 		return outarray;
 	};
+	var addedBeforeUnloadEvent=false;
 	var start=function(){
-		$('#code').add('#input').add('#startbtn').attr('disabled',true);
+		codeTextarea.disabled=inputBox.disabled=startBtn.disabled=true;
+		if (!addedBeforeUnloadEvent) {
+			addedBeforeUnloadEvent=true;
+			document.body.onbeforeunload=function(){
+				 return 'Sei sicuro di voler uscire?';
+			};
+		}
 		try {
-			input=String($('#code').val()).toUpperCase().replace(new RegExp('(?:\r\n|\r)','g'),'\n');
+			input=String(codeTextarea.value).toUpperCase().replace(new RegExp('(?:\r\n|\r)','g'),'\n');
 			rules={};
 			passcount=0;
 			lastmove='-';
-			tapetext=String($('#input').val()).toUpperCase();
+			tapetext=String(inputBox.value).toUpperCase();
 			tapepos=0;
 			currstate='0';
 			currtickline=0;
@@ -657,7 +815,7 @@ $(function($){
 				}
 			}
 			//console.log(rules);
-			$('#stopbtn').attr('disabled',false);
+			stopBtn.disabled=false;
 			setspeed();
 			drawtape();
 			tick();
@@ -666,14 +824,14 @@ $(function($){
 			rules={};
 			lastmove='-';
 			currclass=null;
-			$('#code').textareaSelectLine(currline);
+			textareaSelectLine(codeTextarea,currline);
 			setstatus((e instanceof TMError ? 'Errore di sintassi (linea '+(currline+1)+'): '+e.message : 'Errore: '+(e.message||e)));
 			stop();
-			$('#code').add('#input').add('#startbtn').attr('disabled',false);
+			codeTextarea.disabled=inputBox.disabled=startBtn.disabled=false;
 		}
 	};
 	var setspeed=function(){
-		var currval=$('#speed').val();
+		var currval=speedSelect.value;
 		if (currval<1) {
 			speed=1500;
 		} else if (currval==1) {
@@ -702,95 +860,38 @@ $(function($){
 		if (stopped) {
 			return;
 		}
-		$('#stopbtn').attr('disabled',true);
+		stopBtn.disabled=true;
 		drawTimeout=null;
 		tickTimeout=null;
 		stopped=true;
 		clearTimeout(tickTimeout);
 	};
-	$('#statewrap').add('#startbtn').add('#stopbtn').add('#speedlbl').add('#speed').add('#status').add('#tape').add('#moveleft').add('#moveright').bind(("onselectstart" in document.body ? 'selectstart' : 'mousedown'),function(e){e.preventDefault()});
-	$('#startbtn').click(start);
-	$('#stopbtn').click(stop);
-	$('#moveleft').click(function(){
-		if (!$('#startbtn').attr('disabled')) {
+	var preventSelectTo=[stateDiv,startBtn,stopBtn,speedLabel,speedSelect,statusDiv,tapeDiv,moveLeftBtn,moveRightBtn];
+	var selectPreventerEvent=('onselectstart' in document.body ? 'selectstart' : 'mousedown');
+	for (var i=0;i<preventSelectTo.length;i++) {
+		addEvent(preventSelectTo[i],selectPreventerEvent,function(e){e.preventDefault();return false});
+	}
+	preventSelectTo=selectPreventerEvent=null;
+	addEvent(startBtn,'click',start);
+	addEvent(stopBtn,'click',stop);
+	addEvent(moveLeftBtn,'click',function(){
+		if (!startBtn.disabled) {
 			tapepos++;
 			currclass=null;
 			drawtape();
 		}
 	});
-	$('#moveright').click(function(){
-		if (!$('#startbtn').attr('disabled')) {
+	addEvent(moveRightBtn,'click',function(){
+		if (!startBtn.disabled) {
 			tapepos--;
 			currclass=null;
 			drawtape();
 		}
 	});
-	$('#speed').change(function(e,v){setspeed()});
-	$('#code').add('#input').add('#speed').add('#startbtn').attr('disabled',false);
-});
+	addEvent(speedSelect,'input',function(e,v){setspeed()});
+	codeTextarea.disabled=inputBox.disabled=speedSelect.disabled=startBtn.disabled=false;
+})();
 </script>
-</head>
-<body onbeforeunload="return 'Sei sicuro di voler uscire?'">
-<a href="https://github.com/VittGam/JSTMSimulator" id="fork-me-on-github" title="Fork me on GitHub"></a>
-<div id="main">
-<div id="statewrap"><div id="state">0</div></div>
-<textarea id="code" wrap="off" autocomplete="off" disabled></textarea>
-<!--select id="progs" autocomplete="off" disabled><option>Hello world</option></select-->
-<!--input type="button" id="loadbtn" value="Carica" disabled-->
-<input type="button" id="startbtn" value="Esegui" disabled>
-<input type="button" id="stopbtn" value="Stop" disabled>
-<!--input type="range" id="speed" min="0" max="10" value="5" step="1" autocomplete="off" disabled-->
-<span id="speedlbl">Velocità:</span>
-<select id="speed" autocomplete="off" disabled class="fd_hide_input fd_tween">
-<option value="0">0</option>
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-<option value="5" selected>5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-<option value="10">10</option>
-</select>
-<input type="text" id="input" autocomplete="off" value="" disabled>
-<div id="status">JSTMSimulator v1.0 by VittGam</div>
-<div id="tape">
-<span id="cell0"></span>
-<span id="cell1"></span>
-<span id="cell2"></span>
-<span id="cell3"></span>
-<span id="cell4"></span>
-<span id="cell5"></span>
-<span id="cell6"></span>
-<span id="cell7"></span>
-<span id="cell8"></span>
-<span id="cell9"></span>
-<span id="cell10"></span>
-<span id="cell11"></span>
-<span id="cell12"></span>
-<span id="cell13"></span>
-<span id="cell14"></span>
-<span id="cell15"></span>
-<span id="cell16"></span>
-<span id="cell17"></span>
-<span id="cell18"></span>
-<span id="cell19"></span>
-<span id="cell20"></span>
-<span id="cell21"></span>
-<span id="cell22"></span>
-<span id="cell23"></span>
-<span id="cell24"></span>
-<span id="cell25"></span>
-<span id="cell26"></span>
-<span id="cell27"></span>
-<span id="cell28"></span>
-<span id="cell29"></span>
-<span id="cell30"></span>
-</div>
-<div id="moveleft"></div>
-<div id="moveright"></div>
-</div>
 </body>
 </html>
+
