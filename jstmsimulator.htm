@@ -433,7 +433,7 @@ body {
 		if (elm.addEventListener) {
 			elm.addEventListener(evt,func,false);
 		} else if (elm.attachEvent) {
-			elm.attachEvent('on'+(evt=='input' ? 'propertychange' : evt),func);
+			elm.attachEvent('on'+(evt=='change' ? 'propertychange' : evt),func);
 		}
 	};
 	var inArray=function(currarray,elm){
@@ -515,7 +515,7 @@ body {
 			setstatus('Passi: '+passcount,true);
 		}
 		if (currclass!==oldclass) {
-			mainDiv.className=((currclass===0 || currclass===1 || currclass===2 || currclass===3 || currclass===4) ? 'anim'+currclass : '');
+			mainDiv.className=((currclass===1 || currclass===2) ? 'anim'+currclass : '');
 		}
 		if (currclass===0 && stopped) {
 			input='';
@@ -889,7 +889,7 @@ body {
 			drawtape();
 		}
 	});
-	addEvent(speedSelect,'input',function(e,v){setspeed()});
+	addEvent(speedSelect,'change',function(e,v){setspeed()});
 	codeTextarea.disabled=inputBox.disabled=speedSelect.disabled=startBtn.disabled=false;
 })();
 </script>
