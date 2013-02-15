@@ -379,6 +379,8 @@ body {
 		READ_ERROR_EMPTY_CHARACTER_CLASS:'One of the character classes in the rule is empty',
 		READ_ERROR_WRONG_CHARACTER_CLASS:'The character classes in the rule are of different length',
 		READ_ERROR_UNEXPECTED_END_OF_RULE:'Unexpected end of rule',
+		WARNING_ASCENDING_CHARACTER_CLASS:'Warning: implicit ascending character classes (eg. "z..a") are not supported by the official simulator!\nWe suggest you to expand implicit ascending classes, for example "9..0" should become "9876543210".',
+		WARNING_WONT_BE_SHOWN_AGAIN:'This warning will not be shown again for this session.',
 		EXIT_CONFIRMATION:'Are you sure you want to exit?'
 	};
 	lang.it={
@@ -400,6 +402,8 @@ body {
 		READ_ERROR_EMPTY_CHARACTER_CLASS:'Una delle classi di caratteri nella regola è vuota',
 		READ_ERROR_WRONG_CHARACTER_CLASS:'Le classi di caratteri nella regola hanno lunghezze differenti',
 		READ_ERROR_UNEXPECTED_END_OF_RULE:'Fine inattesa della regola',
+		WARNING_ASCENDING_CHARACTER_CLASS:'Attenzione: ricorda che le classi di caratteri ascendenti implicite (ad es. "z..a") non sono supportate dal simulatore ufficiale!\nTi suggeriamo di espandere le classi ascendenti implicite, ad esempio "9..0" dovrebbe diventare "9876543210".',
+		WARNING_WONT_BE_SHOWN_AGAIN:'Questo avviso non verrà mostrato di nuovo per questa sessione.',
 		EXIT_CONFIRMATION:'Sei sicuro di voler uscire?'
 	};
 	var currlang=lang.en;
@@ -421,6 +425,7 @@ body {
 	var currstate='0';
 	var currtickline=0;
 	var currclass=null;
+	var ascending_character_class_warning=false;
 	var statusTimeout=null;
 	var drawTimeout=null;
 	var tickTimeout=null;
@@ -760,16 +765,23 @@ body {
 				var stopchar=group.charAt(3);
 				if (stopchar==='\\') {
 					stopchar=group.charAt(4);
-					group=group.substring(1);
+					group=group.substring(5);
+				} else {
+					group=group.substring(4);
 				}
-				group=group.substring(4);
-				if (alphabet.indexOf(startchar)>alphabet.indexOf(stopchar)) {
-					for (var i=alphabet.indexOf(stopchar);i<=alphabet.indexOf(startchar);i++) {
-						outarray.push(prefix+alphabet[i]+suffix);
+				var i=alphabet.indexOf(startchar);
+				var j=alphabet.indexOf(stopchar);
+				if (i<=j) {
+					for (;i<=j;i++) {
+						outarray.push(prefix+alphabet.charAt(i)+suffix);
 					}
 				} else {
-					for (var i=alphabet.indexOf(startchar);i<=alphabet.indexOf(stopchar);i++) {
-						outarray.push(prefix+alphabet[i]+suffix);
+					if (!ascending_character_class_warning) {
+						ascending_character_class_warning=true;
+						alert(currlang.WARNING_ASCENDING_CHARACTER_CLASS+'\n\n'+currlang.WARNING_WONT_BE_SHOWN_AGAIN);
+					}
+					for (;i>=j;i--) {
+						outarray.push(prefix+alphabet.charAt(i)+suffix);
 					}
 				}
 			} else {
@@ -779,10 +791,9 @@ body {
 		}
 		if (reversematch) {
 			var newoutarray=[];
-			var alphasplit=alphabet.split('');
-			for (var i=0;i<alphasplit.length;i++) {
-				if (inArray(outarray,alphasplit[i])===-1) {
-					newoutarray.push(prefix2+alphasplit[i]+suffix2);
+			for (var i=0;i<alphabet.length;i++) {
+				if (inArray(outarray,alphabet.charAt(i))===-1) {
+					newoutarray.push(prefix2+alphabet.charAt(i)+suffix2);
 				}
 			};
 			if (inArray(outarray,' ')===-1) {
