@@ -867,7 +867,7 @@ body {
 		stopped=true;
 		clearTimeout(tickTimeout);
 	};
-	var preventSelectTo=[stateDiv,startBtn,stopBtn,speedLabel,speedSelect,statusDiv,tapeDiv,moveLeftBtn,moveRightBtn];
+	var preventSelectTo=[stateDiv,speedLabel,statusDiv,tapeDiv,moveLeftBtn,moveRightBtn];
 	var selectPreventerEvent=('onselectstart' in document.body ? 'selectstart' : 'mousedown');
 	for (var i=0;i<preventSelectTo.length;i++) {
 		addEvent(preventSelectTo[i],selectPreventerEvent,function(e){if(!e)e=window.event;if(e.preventDefault)e.preventDefault();return false});
