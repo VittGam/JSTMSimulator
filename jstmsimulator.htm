@@ -382,12 +382,12 @@ body {
 	var rules={};
 	var stepcount=0;
 	var lastmove='-';
-	var statusTimeout=null;
 	var tapetext='';
 	var tapepos=0;
 	var currstate='0';
 	var currtickline=0;
 	var currclass=null;
+	var statusTimeout=null;
 	var drawTimeout=null;
 	var tickTimeout=null;
 	var stopped=true;
@@ -783,8 +783,8 @@ body {
 			currstate='0';
 			currtickline=0;
 			currclass=null;
-			drawTimeout=null;
-			tickTimeout=null;
+			clearTimeout(drawTimeout);
+			clearTimeout(tickTimeout);
 			stopped=false;
 			setstatus();
 			var currline=0;
@@ -865,14 +865,8 @@ body {
 		}
 	};
 	var stop=function(){
-		if (stopped) {
-			return;
-		}
 		stopBtn.disabled=true;
-		drawTimeout=null;
-		tickTimeout=null;
 		stopped=true;
-		clearTimeout(tickTimeout);
 	};
 	var preventSelectTo=[stateDiv,speedLabel,statusDiv,tapeDiv,moveLeftBtn,moveRightBtn];
 	var selectPreventerEvent=('onselectstart' in document.body ? 'selectstart' : 'mousedown');
