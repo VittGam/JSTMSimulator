@@ -452,7 +452,6 @@ body {
 	var stopped=true;
 	var speed=750;
 
-	var mainDiv=document.getElementById('main');
 	var statusDiv=document.getElementById('status');
 	var stateDiv=document.getElementById('state');
 	var codeTextarea=document.getElementById('code');
@@ -566,7 +565,6 @@ body {
 	};
 	var drawtape=function(){
 		var redraw=false;
-		var oldclass=currclass;
 		if (currclass===0) {
 			currclass=(lastmove==='-' ? 3 : 1);
 		} else if (currclass===1) {
@@ -861,7 +859,7 @@ body {
 		if (!addedBeforeUnloadEvent) {
 			addedBeforeUnloadEvent=true;
 			window.onbeforeunload=function(){
-				 return currlang.EXIT_CONFIRMATION;
+				return currlang.EXIT_CONFIRMATION;
 			};
 		}
 		try {
