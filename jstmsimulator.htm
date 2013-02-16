@@ -25,6 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 <html>
 <head>
 <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <title>JSTMSimulator by VittGam</title>
 <style>
 html, body {
@@ -36,12 +37,13 @@ body {
 	font: 15px arial,sans-serif;
 	background: #008b54;
 }
-#main, #tape {
-	background: url(jstmsimulator.gif) no-repeat;
+#main, #tape #tapebg {
+	background-image: url(jstmsimulator.gif);
+	background-repeat: no-repeat;
 }
 #main {
 	position: relative;
-	background-position: -720px 0;
+	background-position: -720px 0px;
 	width: 950px;
 	height: 574px;
 	margin: 8px auto;
@@ -74,6 +76,8 @@ body {
 	z-index: 4;
 	left: 720px;
 	top: 0;
+	font-size: 13px;
+	line-height: 16px;
 	width: 226px;
 	height: 568px; /*520px*/
 	overflow: scroll;
@@ -140,31 +144,46 @@ body {
 	height: 16px;
 }
 #tape {
-	background-position: 0 0;
 	position: absolute;
 	z-index: 2;
 	left: 0;
 	top: 314px;
 	width: 720px;
 	height: 209px;
+	overflow: hidden;
 }
-#tape.anim1 {
-	background-position: 0 -418px;
+#tape #tapebg {
+	background-position: 0px 0px;
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 720px;
+	height: 627px;
 }
-#tape.anim2 {
-	background-position: 0 -209px;
+#tape.anim1 #tapebg {
+	top: -418px;
+}
+#tape.anim2 #tapebg {
+	top: -209px;
 }
 #tape span {
 	position: absolute;
 	font-weight: bold;
 	width: 10px;
 	height: 16px;
+	z-index: 2;
 }
 #tape.anim1 span {
-	margin-left: 2px;
+	margin-left: 1px;
 }
 #tape.anim2 span {
-	margin-left: -4px;
+	margin-left: -6px;
+	margin-top: -1px;
+}
+#tape.movedleft span#cell16,
+#tape.movedright span#cell14 {
+	color: green;
 }
 #tape span#cell0{left:156px;top:35px}
 #tape span#cell1{left:167px;top:36px}
@@ -322,6 +341,7 @@ body {
 <input type="text" id="input" autocomplete="off" value="" disabled>
 <div id="status">JSTMSimulator by VittGam</div>
 <div id="tape">
+<div id="tapebg"></div>
 <span id="cell0"></span>
 <span id="cell1"></span>
 <span id="cell2"></span>
@@ -496,46 +516,53 @@ body {
 		}
 		return -1;
 	};
-	var textareaSelect=function(currtextarea,startpos,endpos){
-		if (typeof startpos!='number' || startpos<0 || startpos>currtextarea.value.length) {
-			startpos=0;
-		}
-		if (typeof endpos!='number' || endpos>currtextarea.value.length) {
-			endpos=currtextarea.value.length;
-		}
-		if (endpos<=startpos) {
-			return;
-		}
-		if (startpos===0 && endpos===currtextarea.value.length) {
-			if (typeof currtextarea.select=='function'){
-				currtextarea.select();
-			}
-			return;
-		}
-		if (typeof currtextarea.createTextRange=='function') {
-			var range=currtextarea.createTextRange();
-			range.moveStart('character',startpos);
-			range.moveEnd('character',endpos-currtextarea.value.length);
-			range.select();
-			range=null;
-		} else if (typeof currtextarea.setSelectionRange=='function'){
-			currtextarea.setSelectionRange(startpos,endpos);
-		}
-	};
 	var textareaSelectLine=function(currtextarea,linenumber){
-		if (linenumber<0) {
-			return;
-		}
-		var startpos=0;
-		var endpos=0;
-		for (var i=linenumber;i>0;i--) {
-			startpos=currtextarea.value.indexOf('\n',startpos)+1;
-			if (startpos===0) {
+		try {
+			if (linenumber<0) {
 				return;
 			}
-		}
-		endpos=currtextarea.value.indexOf('\n',startpos);
-		textareaSelect(currtextarea,startpos,endpos);
+			var startpos=0;
+			var endpos=0;
+			var currtextareavalue=currtextarea.value.replace(/\r\n/g,'\n');
+			var currtextareavaluelen=currtextareavalue.length;
+			for (var i=linenumber;i>0;i--) {
+				startpos=currtextareavalue.indexOf('\n',startpos)+1;
+				if (startpos===0) {
+					return;
+				}
+			}
+			endpos=currtextareavalue.indexOf('\n',startpos);
+			if (typeof startpos!='number' || startpos<0 || startpos>currtextareavaluelen) {
+				startpos=0;
+			}
+			if (typeof endpos!='number' || endpos<0 || endpos>currtextareavaluelen) {
+				endpos=currtextareavaluelen;
+			}
+			if (endpos<=startpos) {
+				return;
+			}
+			var textarealineheight=null;
+			if ((window.getComputedStyle && (textarealineheight=window.getComputedStyle(currtextarea,null))) || (document.defaultView && document.defaultView.getComputedStyle && (textarealineheight=document.defaultView.getComputedStyle(currtextarea,null)))) {
+				textarealineheight=parseInt(textarealineheight.getPropertyValue('line-height'),10);
+			}
+			if (!textarealineheight) {
+				textarealineheight=parseInt((currtextarea.currentStyle || currtextarea.style || {}).lineHeight || 16,10);
+			}
+			currtextarea.scrollTop=Math.max(0,linenumber*textarealineheight-(currtextarea.clientHeight-textarealineheight)/2);
+			textarealineheight=null;
+			if (startpos===0 && endpos===currtextareavaluelen && typeof currtextarea.select=='function') {
+				currtextarea.select();
+			} else if (currtextarea.setSelectionRange){
+				currtextarea.setSelectionRange(startpos,endpos);
+			} else if (currtextarea.createTextRange) {
+				var range=currtextarea.createTextRange();
+				range.collapse(true);
+				range.moveEnd('character',endpos);
+				range.moveStart('character',startpos);
+				range.select();
+				range=null;
+			}
+		} catch (e) {}
 	};
 	var drawtape=function(){
 		var redraw=false;
@@ -560,20 +587,35 @@ body {
 			for (var i=0;i<31;i++) {
 				setTextContent(cells[i],tapetext.charAt(i+tapepos-15));
 			}
-			//textareaSelectLine(codeTextarea,currtickline); // FIXME buggy...
+			if (startBtn.disabled) {
+				textareaSelectLine(codeTextarea,currtickline);
+			}
 			setTextContent(stateDiv,currstate);
 			setstatus(currlang.STEPS_LABEL+' '+stepcount,true);
 		}
-		if (currclass!==oldclass) {
-			tapeDiv.className=((currclass===1 || currclass===2) ? 'anim'+currclass : '');
+		var newClassName=[];
+		if (currclass===1 || currclass===2) {
+			newClassName.push('anim'+currclass);
 		}
+		if (currclass===2) {
+			if (lastmove==='<') {
+				newClassName.push('movedleft');
+			} else if (lastmove==='>') {
+				newClassName.push('movedright');
+			}
+		}
+		newClassName=newClassName.join(' ');
+		if (tapeDiv.className!==newClassName) {
+			tapeDiv.className=newClassName;
+		}
+		newClassName=null;
 		if (currclass===0 && stopped) {
 			input='';
 			rules={};
 			lastmove='-';
 			currclass=null;
 			setstatus(currlang.STOPPED+' '+currlang.STEPS_LABEL+' '+stepcount,true);
-			codeTextarea.disabled=inputBox.disabled=startBtn.disabled=false;
+			codeTextarea.readOnly=inputBox.disabled=startBtn.disabled=false;
 			return;
 		}
 		drawTimeout=setTimeout(drawtape,Math.max(speed/3,130));
@@ -815,7 +857,7 @@ body {
 	};
 	var addedBeforeUnloadEvent=false;
 	var start=function(){
-		codeTextarea.disabled=inputBox.disabled=startBtn.disabled=true;
+		codeTextarea.readOnly=inputBox.disabled=startBtn.disabled=true;
 		if (!addedBeforeUnloadEvent) {
 			addedBeforeUnloadEvent=true;
 			window.onbeforeunload=function(){
@@ -884,7 +926,7 @@ body {
 			textareaSelectLine(codeTextarea,currline);
 			setstatus((e instanceof TMError ? currlang.SYNTAX_ERROR_LABEL.replace('%d',currline+1)+' '+e.message : currlang.UNKNOWN_ERROR_LABEL+' '+(e.message||e)));
 			stop();
-			codeTextarea.disabled=inputBox.disabled=startBtn.disabled=false;
+			codeTextarea.readOnly=inputBox.disabled=startBtn.disabled=false;
 		}
 	};
 	var setspeed=function(){
@@ -926,21 +968,21 @@ body {
 	addEvent(startBtn,'click',start);
 	addEvent(stopBtn,'click',stop);
 	addEvent(moveLeftBtn,'click',function(){
-		if (!startBtn.disabled) {
+		if (stopped && !startBtn.disabled) {
 			tapepos++;
 			currclass=null;
 			drawtape();
 		}
 	});
 	addEvent(moveRightBtn,'click',function(){
-		if (!startBtn.disabled) {
+		if (stopped && !startBtn.disabled) {
 			tapepos--;
 			currclass=null;
 			drawtape();
 		}
 	});
 	addEvent(speedSelect,'change',function(e,v){setspeed()});
-	codeTextarea.disabled=inputBox.disabled=speedSelect.disabled=startBtn.disabled=false;
+	codeTextarea.disabled=codeTextarea.readOnly=inputBox.disabled=speedSelect.disabled=startBtn.disabled=false;
 })();
 </script>
 </body>
