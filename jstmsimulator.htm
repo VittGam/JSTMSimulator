@@ -326,17 +326,18 @@ body {
 <input type="button" id="stopbtn" value="" disabled>
 <span id="speedlbl"></span>
 <select id="speed" autocomplete="off" disabled>
-<option value="0">0</option>
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-<option value="5" selected>5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-<option value="10">10</option>
+<option>0</option>
+<option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option selected>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>Max (async)</option>
 </select>
 <input type="text" id="input" autocomplete="off" value="" disabled>
 <div id="status">JSTMSimulator by VittGam</div>
@@ -450,7 +451,9 @@ body {
 	var drawTimeout = null;
 	var tickTimeout = null;
 	var stopped = true;
-	var speed = 750;
+	var tickSpeed = 750;
+	var drawSpeed = 150;
+	var speedToTimeoutMapping = [1500, 1350, 1200, 1050, 900, 750, 600, 450, 300, 150, 0, 0];
 
 	var statusDiv = document.getElementById('status');
 	var stateDiv = document.getElementById('state');
@@ -620,7 +623,7 @@ body {
 			codeTextarea.readOnly = inputBox.disabled = startBtn.disabled = false;
 			return;
 		}
-		drawTimeout = setTimeout(drawtape, Math.max(speed / 3, 130));
+		drawTimeout = setTimeout(drawtape, drawSpeed);
 	};
 	var tick = function(){
 		if (stopped) {
@@ -653,7 +656,7 @@ body {
 		stepcount++;
 		currtickline = rules[currstate][currchar][3];
 		currstate = rules[currstate][currchar][0];
-		tickTimeout = setTimeout(tick, speed);
+		tickTimeout = setTimeout(tick, tickSpeed);
 	};
 	var unescapedIndexOf = function(input, srch, startidx){
 		var output = (typeof startidx == 'undefined' ? 0 : startidx) - 1;
@@ -931,30 +934,8 @@ body {
 		}
 	};
 	var setspeed = function(){
-		var currval = parseInt(speedSelect.value, 10);
-		if (currval < 1) {
-			speed = 1500;
-		} else if (currval === 1) {
-			speed = 1350;
-		} else if (currval === 2) {
-			speed = 1200;
-		} else if (currval === 3) {
-			speed = 1050;
-		} else if (currval === 4) {
-			speed = 900;
-		} else if (currval === 5) {
-			speed = 750;
-		} else if (currval === 6) {
-			speed = 600;
-		} else if (currval === 7) {
-			speed = 450;
-		} else if (currval === 8) {
-			speed = 300;
-		} else if (currval === 9) {
-			speed = 150;
-		} else {
-			speed = 0;
-		}
+		tickSpeed = speedToTimeoutMapping[speedSelect.selectedIndex];
+		drawSpeed = (speedSelect.selectedIndex === 11 ? 130 : tickSpeed / 3);
 	};
 	var stop = function(){
 		stopBtn.disabled = true;
