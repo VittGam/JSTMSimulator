@@ -98,13 +98,33 @@ body.displayresults #main {
 	padding: 2px;
 	border: 0;
 }
+#username {
+	position: absolute;
+	z-index: 4;
+	left: 720px;
+	top: 0;
+	width: 226px;
+	height: 16px;
+	font: 13px arial,sans-serif;
+	line-height: 16px;
+	color: white;
+	white-space: nowrap;
+	text-align: center;
+	font-weight: bold;
+	text-shadow: black 0 0 6px;
+	display: none;
+}
+body.loadmode.savemode #username {
+	display: block;
+}
 #status {
 	position: absolute;
 	z-index: 3;
 	left: 0;
 	top: 507px;
 	width: 716px;
-	height: 13px;
+	height: 16px;
+	line-height: 16px;
 	text-align: right;
 	color: white;
 	white-space: nowrap;
@@ -141,6 +161,10 @@ body.displayresults #main {
 }
 body.loadmode #code {
 	height: 520px;
+}
+body.loadmode.savemode #code {
+	top: 18px;
+	height: 502px;
 }
 body.loadmode #progs,
 body.loadmode #loadbtn,
@@ -373,6 +397,7 @@ body.loadmode.savemode #fork-me-on-github {
 <noscript><div id="noscript-alert">Please enable JavaScript in your browser.</div></noscript>
 <div id="main">
 <div id="state">0</div>
+<div id="username"></div>
 <textarea id="code" wrap="off" autocomplete="off" disabled></textarea>
 <select id="progs" autocomplete="off" disabled></select>
 <input type="button" id="loadbtn" value="" disabled>
@@ -812,7 +837,8 @@ lang.en = {
 	LOAD_RESULT_OK: 'Program loaded successfully from the server.',
 	LOAD_RESULT_FAIL: 'An unknown error occurred while trying to load the program from the server. Please try again later.',
 	SAVE_RESULT_OK: 'Program saved successfully on the server.',
-	SAVE_RESULT_FAIL: 'An unknown error occurred while trying to save the program on the server. Please try again later.'
+	SAVE_RESULT_FAIL: 'An unknown error occurred while trying to save the program on the server. Please try again later.',
+	USERNAME_LABEL: 'User:'
 };
 lang.it = {
 	START_BUTTON: 'Esegui',
@@ -843,7 +869,8 @@ lang.it = {
 	LOAD_RESULT_OK: 'Programma caricato con successo dal server.',
 	LOAD_RESULT_FAIL: 'Si è verificato un errore sconosciuto durante il caricamento del programma dal server. Riprova più tardi.',
 	SAVE_RESULT_OK: 'Programma salvato con successo sul server.',
-	SAVE_RESULT_FAIL: 'Si è verificato un errore sconosciuto durante il salvataggio del programma sul server. Riprova più tardi.'
+	SAVE_RESULT_FAIL: 'Si è verificato un errore sconosciuto durante il salvataggio del programma sul server. Riprova più tardi.',
+	USERNAME_LABEL: 'Utente:'
 };
 var currlang = lang.en;
 try {
@@ -863,10 +890,11 @@ var drawTimeout = null;
 var tickTimeout = null;
 var tickSpeed = null;
 var drawSpeed = null;
-var speedToTimeoutMapping = [1500, 1350, 1200, 1050, 900, 750, 600, 450, 300, 150, 0, 0];
+var speedToTimeoutMapping = [1500, 1350, 1200, 1050, 900, 750, 600, 450, 300, 150, 0, -1];
 
 var statusDiv = document.getElementById('status');
 var stateDiv = document.getElementById('state');
+var usernameDiv = document.getElementById('username');
 var codeTextarea = document.getElementById('code');
 var inputBox = document.getElementById('input');
 var tapeDiv = document.getElementById('tape');
@@ -959,6 +987,9 @@ var textareaSelectLine = function(currtextarea, linenumber){
 			range.select();
 			range = null;
 		}
+		window.setTimeout(function(){
+			currtextarea.scrollLeft = 0;
+		}, 0);
 	} catch (e) {}
 };
 var drawtape = function(){
@@ -1015,7 +1046,12 @@ var drawtape = function(){
 };
 var setspeed = function(){
 	tickSpeed = speedToTimeoutMapping[speedSelect.selectedIndex];
-	drawSpeed = (speedSelect.selectedIndex === 11 ? 130 : tickSpeed / 3);
+	if (tickSpeed === -1) {
+		tickSpeed = 0;
+		drawSpeed = 130;
+	} else {
+		drawSpeed = tickSpeed / 3;
+	}
 };
 var start = function(){
 	turingMachineInstance = new TuringMachine({
@@ -1035,6 +1071,7 @@ var start = function(){
 			setstatus();
 			stopBtn.disabled = false;
 			setspeed();
+			codeTextarea.focus();
 			drawtape();
 		},
 		onstop: function(){
@@ -1062,7 +1099,7 @@ var start = function(){
 	});
 	turingMachineInstance.start();
 };
-var preventSelectTo = [stateDiv, speedLabel, statusDiv, tapeDiv, moveLeftBtn, moveRightBtn];
+var preventSelectTo = [stateDiv, usernameDiv, speedLabel, statusDiv, tapeDiv, moveLeftBtn, moveRightBtn];
 var selectPreventerEvent = ('onselectstart' in document.body ? 'selectstart' : 'mousedown');
 var selectPreventerFunc = function(e){
 	if (!e) {
