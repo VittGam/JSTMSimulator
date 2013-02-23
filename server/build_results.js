@@ -109,7 +109,7 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 					onerror: function(obj){
 						curruserproblem.error = obj;
 					},
-					warn: function(warning){
+					onwarning: function(warning){
 						currtestcase.warnings.push(warning);
 					}
 				});
