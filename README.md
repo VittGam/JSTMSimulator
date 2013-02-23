@@ -14,12 +14,14 @@ You can find it on https://server1.vittgam.net/jstmsimulator/.
 
 To compile the simulator you'll need NodeJS (I'm using v0.8.20) with the following modules: (install with `npm install module`)
 
-- uglifycss
-- uglify-js
+- `uglifycss`
+- `uglify-js`
 
 To compile the simulator just run:
 
-`node build_simulator.js`
+```
+node build_simulator.js
+```
 
 You'll find the compiled simulator in `out/jstmsimulator.htm`.
 
@@ -27,25 +29,31 @@ You'll find the compiled simulator in `out/jstmsimulator.htm`.
 
 To run the contest server you'll also need the following NodeJS modules:
 
-- async
-- express
-- sanitizer
-- sqlite3
+- `async`
+- `express`
+- `sanitizer`
+- `sqlite3`
 
 To run the contest server, first build the database by editing and running the file:
 
-`node server/init_contest_database.sample.js`
+```
+node server/init_contest_database.sample.js
+```
 
 Then run:
 
-`node server/server.js`
+```
+node server/server.js
+```
 
 The contest server listens by default on 0.0.0.0:8081, and the admin server on 0.0.0.0:8082.
 The admin server default credentials are admin:admin.
 
 To generate the contest result pages run:
 
-`node server/build_results.js`
+```
+node server/build_results.js
+```
 
 You'll find them in `server/results/GENERATION_TIMESTAMP`.
 
