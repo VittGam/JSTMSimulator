@@ -21,34 +21,30 @@ var xmlhttp = function(url, postdata, onload){
 			return;
 		}
 		xmlhttp.onreadystatechange = function(){
-			if (this.readyState !== 4) {
+			if (!(not_done && xmlhttp && xmlhttp.readyState === 4)) {
 				return;
 			}
-			if (!not_done) {
-				return;
-			}
-			this.onreadystatechange = not_done = null;
+			not_done = null;
 			if (onload) {
-				if (this.status === 200) {
+				if (xmlhttp.status === 200) {
 					try {
-						var decodedRespText = JSON.parse(this.responseText);
+						var decodedRespText = JSON.parse(xmlhttp.responseText);
 					} catch (e) {
-						onload(false, null, this);
+						onload(false, null, xmlhttp);
 						onload = null;
 						return;
 					}
-					onload(true, decodedRespText, this);
+					onload(true, decodedRespText, xmlhttp);
 				} else {
-					onload(false, null, this);
+					onload(false, null, xmlhttp);
 				}
 			}
-			onload = null;
+			xmlhttp = onload = null;
 		};
 		xmlhttp.open((postdata !== null ? 'POST' : 'GET'), url, true);
 		if (postdata !== null) {
 			xmlhttp.setRequestHeader('Content-Type', 'text/plain; charset=UTF-8');
 		}
 		xmlhttp.send(postdata !== null ? postdata : null);
-		xmlhttp=null;
 	} catch (e) {}
 };
