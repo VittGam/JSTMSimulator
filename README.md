@@ -12,7 +12,7 @@ You can find it on https://server1.vittgam.net/jstmsimulator/.
 
 ## How to compile
 
-To compile the simulator you'll need NodeJS (I'm using v0.8.20) with the following modules: (install with `npm install module`)
+To compile the simulator you'll need NodeJS (I'm using v0.8.20) with the following modules: (install with `npm install module_name`)
 
 - `uglifycss`
 - `uglify-js`
