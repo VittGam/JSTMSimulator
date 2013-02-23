@@ -8,7 +8,7 @@ For the machine syntax, I'm going to write it in the wiki. In the meantime, plea
 
 ## Online Version
 
-You can find it on `https://server1.vittgam.net/jstmsimulator/`.
+You can find it on https://server1.vittgam.net/jstmsimulator/.
 
 ## How to compile
 
