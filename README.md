@@ -66,4 +66,4 @@ Any suggestion? Please create an issue or a pull request, or drop me a line at `
 
 ## License
 
-The MIT license. Please see the LICENSE file for more details.
+The MIT license. Please see the `LICENSE` file for more details.
