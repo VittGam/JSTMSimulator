@@ -110,6 +110,7 @@ body.loadmode.savemode #username {
 	top: 526px;
 	width: 230px;
 	height: 24px;
+	cursor: default;
 }
 #loadbtn {
 	display: none;
@@ -177,6 +178,7 @@ body.loadmode.savemode #loadbtn {
 	top: 526px;
 	width: 170px;
 	height: 24px;
+	cursor: default;
 }
 #input {
 	position: absolute;
