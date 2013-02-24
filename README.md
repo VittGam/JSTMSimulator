@@ -12,7 +12,13 @@ You can find it on https://server1.vittgam.net/jstmsimulator/.
 
 ## How to compile
 
-To compile the simulator you'll need NodeJS (I'm using v0.8.20) with the following modules: (install with `npm install module_name`)
+To get the sources you need to have Git installed on your computer.
+
+```
+git clone git://github.com/VittGam/JSTMSimulator.git
+```
+
+You'll need NodeJS (I'm using v0.8.20) with the following modules: (install with `npm install module_name`)
 
 - `uglifycss`
 - `uglify-js`
@@ -27,14 +33,20 @@ You'll find the compiled simulator in `out/jstmsimulator.htm`.
 
 ## The contest server
 
-To run the contest server you'll also need the following NodeJS modules:
+To run the contest server you need to get the JSON3 submodule:
+```
+git submodule init
+git submodule update
+```
+
+Then you'll also need to install the following NodeJS modules:
 
 - `async`
 - `express`
 - `sanitizer`
 - `sqlite3`
 
-To run the contest server, first create the database by editing and running the file:
+After you've done with the prerequisites, first create the database by editing and running the file:
 
 ```
 node server/init_contest_database.sample.js

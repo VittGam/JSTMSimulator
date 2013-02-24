@@ -1,3 +1,3 @@
 [submodule "server/lib/json3"]
 	path = server/lib/json3
-	url = git@github.com:bestiejs/json3.git
+	url = git://github.com/bestiejs/json3.git
