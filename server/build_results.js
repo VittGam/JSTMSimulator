@@ -147,7 +147,7 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 		var lastsavetime = (lastsavehour < 10 ? '0' : '') + lastsavehour + ':' + (lastsavemins < 10 ? '0' : '') + lastsavemins + ':' + (lastsavesecs < 10 ? '0' : '') + lastsavesecs;
 		var contestTableHtml = '<div id="results"><h1 align="center">Verifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><p>Per provare usare il <a href="#simulator">simulatore</a> pre-caricato con i problemi della squadra \'<i>'+sanitizer.escape(String(row.username))+'</i>\'.</p><h2>Sommario ('+points+' punt'+(points === 1 ? 'o' : 'i')+', ultimo salvataggio '+lastsavetime+')</h2><table border="1">';
 		contestProblems.forEach(function(currproblem, j){
-			contestTableHtml += '<tr><td><a'+(currproblem.testcases.length > 0 ? ' href="#'+sanitizer.escape(String(currproblem.id))+'"' : '')+'>'+sanitizer.escape(String(currproblem.name))+'</a> (<a href="progs/'+sanitizer.escape(String(currproblem.id))+'.t">download</a>)</td><td>'+(currproblem.testcases.length > 0 ? (currproblem.userdata[row.username].success ? 'OK' : 'FAIL') : 'N/A')+'</td><td>'+currproblem.points+'</td></tr>';
+			contestTableHtml += '<tr><td><a'+(currproblem.testcases.length > 0 ? ' href="#'+sanitizer.escape(String(currproblem.id))+'"' : '')+'>'+sanitizer.escape(String(currproblem.name))+'</a> (<a href="progs/'+sanitizer.escape(String(currproblem.id))+'.t">download</a>)</td><td>'+(currproblem.testcases.length > 0 ? (currproblem.userdata[row.username].success ? 'OK' : 'FAIL') : 'N/A')+'</td><td>'+(currproblem.testcases.length > 0 ? currproblem.points : 'N/A')+'</td></tr>';
 		});
 		contestTableHtml += '</table>';
 		contestProblems.forEach(function(currproblem, j){

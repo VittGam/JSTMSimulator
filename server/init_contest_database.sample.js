@@ -27,7 +27,9 @@ if (exists) {
 		db.run('CREATE TABLE testcases (id TEXT NOT NULL, initialtape TEXT, expectedtape TEXT)');
 
 		var stmt = db.prepare('INSERT INTO users VALUES (?, ?)');
-		stmt.run('testuser', 'testpass');
+		stmt.run('testuser1', 'testpass1');
+		stmt.run('testuser2', 'testpass2');
+		stmt.run('testuser3', 'testpass3');
 		stmt.finalize();
 		stmt = null;
 

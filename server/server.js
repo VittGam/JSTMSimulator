@@ -16,7 +16,6 @@ var uglifyjs = require('uglify-js');
 var uglifycss = require('uglifycss').processString;
 var express = require('express');
 var async = require('async');
-var sanitizer = require('sanitizer');
 
 var dbname = path.join(__dirname, 'database.sqlite');
 if (!fs.existsSync(dbname)) {
@@ -26,6 +25,7 @@ var db = new sqlite3.Database(dbname);
 
 var licenseText = fs.readFileSync(path.join(__dirname, '..', 'LICENSE'));
 var cssStyle = fs.readFileSync(path.join(__dirname, '..', 'lib', 'style.css'));
+var htmlheadHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'htmlhead.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
 var iecsshacksHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'iecsshacks.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
 var turingMachineHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'TuringMachine.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
 var json3JS = fs.readFileSync(path.join(__dirname, 'lib', 'json3', 'lib', 'json3.js'));
@@ -35,7 +35,7 @@ var handleHTMLPageJS = fs.readFileSync(path.join(__dirname, '..', 'lib', 'handle
 var handleContestProblemsJS = fs.readFileSync(path.join(__dirname, 'lib', 'handleContestProblems.js'));
 var xmlhttpfuncJS = fs.readFileSync(path.join(__dirname, 'lib', 'xmlhttpfunc.js'));
 var xmlhttpContestJS = fs.readFileSync(path.join(__dirname, 'lib', 'xmlhttpContest.js'));
-var finalHTML = ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>JSTMSimulator by VittGam</title><style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode savemode">' + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + json3JS + 'var handleConnection = function(username, contestProblems){' + handleHTMLPageJS + handleContestProblemsJS + '};' + xmlhttpfuncJS + xmlhttpContestJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n'); // just another IE 6 fix
+var finalHTML = ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>JSTMSimulator by VittGam</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode savemode">' + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + json3JS + 'var handleConnection = function(username, contestProblems){' + handleHTMLPageJS + handleContestProblemsJS + '};' + xmlhttpfuncJS + xmlhttpContestJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n'); // just another IE 6 fix
 
 var getEmptyCodeJS = fs.readFileSync(path.join(__dirname, 'lib', 'getEmptyCode.js'));
 eval(getEmptyCodeJS.toString());
@@ -129,53 +129,97 @@ var adminapp = express();
 adminapp.listen(8082);
 adminapp.use(express.logger('[admin] :remote-addr - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
 adminapp.use(express.basicAuth('admin', 'admin', 'JSTMSimulator Contest Admin'));
+adminapp.use(express.json());
 
-adminapp.get('/', function(req, res){
+userapp.get('/glyphicons-halflings.png', function(req, res){
+	res.sendfile(path.join(__dirname, 'lib', 'bootstrap', 'img', 'glyphicons-halflings.png'));
+});
+
+userapp.get('/glyphicons-halflings-white.png', function(req, res){
+	res.sendfile(path.join(__dirname, 'lib', 'bootstrap', 'img', 'glyphicons-halflings-white.png'));
+});
+
+var adminInterfaceCss = fs.readFileSync(path.join(__dirname, 'lib', 'adminInterface.css'));
+var adminInterfaceHtml = fs.readFileSync(path.join(__dirname, 'lib', 'adminInterface.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
+var adminInterfaceJS = fs.readFileSync(path.join(__dirname, 'lib', 'adminInterface.js'));
+var jqueryJS = fs.readFileSync(path.join(__dirname, 'lib', 'jquery.min.js')).toString().replace(new RegExp('\\n?//@ sourceMappingURL=jquery\\.min\\.map\\n?', 'g'), '');
+var bootstrapJS = fs.readFileSync(path.join(__dirname, 'lib', 'bootstrap', 'js', 'bootstrap.min.js'));
+var bootstrapCss = fs.readFileSync(path.join(__dirname, 'lib', 'bootstrap', 'css', 'bootstrap.min.css')).toString().replace(new RegExp('\\.\\./img/glyphicons', 'g'), 'glyphicons');
+var bootstrapRespCss = fs.readFileSync(path.join(__dirname, 'lib', 'bootstrap', 'css', 'bootstrap-responsive.min.css'));
+var finalAdminHTML = ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>JSTMSimulator Contest Admin</title><style>' + bootstrapCss + bootstrapRespCss + uglifycss(String(adminInterfaceCss)) + '</style></head><body>' + adminInterfaceHtml + '<script>' + uglifyjs.minify('(function(){' + json3JS + xmlhttpfuncJS + adminInterfaceJS + '})();', {fromString: true}).code + '</script><script>' + jqueryJS + bootstrapJS + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n'); // just another IE 6 fix
+
+var adminGetData = function(callback){
 	async.parallel({
-		users: function(callback){
-			db.all('SELECT username, password FROM users', callback);
-		},
 		problems: function(callback){
 			db.all('SELECT id, name, points FROM problems', callback);
 		},
-		userdata: function(callback){
-			db.all('SELECT id, username, code, timestamp FROM userdata', callback);
-		},
 		testcases: function(callback){
 			db.all('SELECT id, initialtape, expectedtape FROM testcases', callback);
+		},
+		users: function(callback){
+			db.all('SELECT username, password FROM users', callback);
+		},
+		userdata: function(callback){
+			db.all('SELECT id, username, code, timestamp FROM userdata', callback);
 		}
-	}, function(err, results) {
-		if (err) {
-			res.send(500, 'Error!');
-			return;
+	}, callback);
+};
+
+adminapp.get('/', function(req, res){
+	res.type('html');
+	res.send(200, finalAdminHTML);
+});
+
+adminapp.get('/ajax/getData', function(req, res){
+	adminGetData(function(err, results) {
+		if (!err && results) {
+			res.json({success: true, data: results});
+		} else {
+			res.json({success: false});
 		}
-		res.set('Content-Type', 'text/html');
-		res.write('<html><head><title>JSTMSimulator Contest Admin</title></head><body><h1>JSTMSimulator Contest Admin</h1>');
-		for (var currtable in results) {
-			res.write('<h2>' + sanitizer.escape(String(currtable)) + '</h2>');
-			if (results[currtable]) {
-				res.write('<table border="1">');
-				if (results[currtable].length) {
-					for (var currelm in results[currtable][0]) {
-						res.write('<th>' + sanitizer.escape(String(currelm)) + '</th>');
-					}
-					results[currtable].forEach(function(row){
-						res.write('<tr>');
-						for (var currelm in row) {
-							res.write('<td><pre>' + (typeof row[currelm] === 'number' ? parseInt(row[currelm], 10) : sanitizer.escape(String(row[currelm]))) + '</pre></td>');
-						}
-						res.write('</tr>');
-					});
-				}
-				res.write('</table>');
-			} else {
-				res.write('<p>Cannot get ' + sanitizer.escape(String(currtable)) + ' table!</p>');
-			}
-		}
-		res.write('</body></html>');
-		res.end();
 	});
 });
 
-// TODO implement admin app interactivity
+var adminEditCompletionCallback = function(err){
+	if (err) {
+		res.json({success: false});
+	} else {
+		adminGetData(function(err, results) {
+			if (!err && results) {
+				res.json({success: true, data: results});
+			} else {
+				res.json({success: false});
+			}
+		});
+	}
+};
 
+adminapp.post('/ajax/edit', function(req, res){
+	if (!req.body) {
+		res.json({success: false});
+	} else if (req.body.action === 'add_user' && req.body.username && req.body.password) {
+		db.run('INSERT INTO users VALUES (?, ?)', [req.body.username, req.body.password], adminEditCompletionCallback);
+	} else if (req.body.action === 'edit_user_password' && req.body.username && req.body.password) {
+		db.run('UPDATE users SET password = ? WHERE username = ?', [req.body.password, req.body.username], adminEditCompletionCallback);
+	} else if (req.body.action === 'delete_user' && req.body.username) {
+		db.run('DELETE FROM users WHERE username = ?', [req.body.username], adminEditCompletionCallback);
+	} else if (req.body.action === 'add_problem' && req.body.id && req.body.name && typeof req.body.points === 'number') {
+		db.run('INSERT INTO problems VALUES (?, ?, ?)', [req.body.id, req.body.name, req.body.points], adminEditCompletionCallback);
+	} else if (req.body.action === 'edit_problem_name' && req.body.id && req.body.name) {
+		db.run('UPDATE problems SET name = ? WHERE id = ?', [req.body.name, req.body.id], adminEditCompletionCallback);
+	} else if (req.body.action === 'edit_problem_points' && req.body.id && typeof req.body.points === 'number') {
+		db.run('UPDATE problems SET points = ? WHERE id = ?', [req.body.points, req.body.id], adminEditCompletionCallback);
+	} else if (req.body.action === 'delete_problem' && req.body.id) {
+		db.run('DELETE FROM problems WHERE id = ?', [req.body.id], adminEditCompletionCallback);
+	} else if (req.body.action === 'add_testcase' && req.body.id && req.body.initialtape && req.body.expectedtape) {
+		db.run('INSERT INTO testcases VALUES (?, ?, ?)', [req.body.id, req.body.initialtape, req.body.expectedtape], adminEditCompletionCallback);
+	} else if (req.body.action === 'edit_testcase_initialtape' && req.body.id && req.body.initialtape) {
+		db.run('UPDATE testcases SET initialtape = ? WHERE id = ?', [req.body.initialtape, req.body.id], adminEditCompletionCallback);
+	} else if (req.body.action === 'edit_testcase_expectedtape' && req.body.id && req.body.expectedtape) {
+		db.run('UPDATE testcases SET expectedtape = ? WHERE id = ?', [req.body.expectedtape, req.body.id], adminEditCompletionCallback);
+	} else if (req.body.action === 'delete_testcase' && req.body.id && req.body.initialtape && req.body.expectedtape) {
+		db.run('DELETE FROM testcases WHERE id = ? AND initialtape = ? AND expectedtape = ?', [req.body.id, req.body.initialtape, req.body.expectedtape], adminEditCompletionCallback);
+	} else {
+		res.json({success: false});
+	}
+});

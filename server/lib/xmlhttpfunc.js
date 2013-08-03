@@ -7,7 +7,7 @@
  * Please see the attached LICENSE file for licensing information.
  */
 
-var xmlhttp = function(url, postdata, onload){
+var xmlhttp = function(url, postdata, onload, method, contenttype){
 	var not_done = true;
 	try {
 		var xmlhttp = null;
@@ -41,9 +41,9 @@ var xmlhttp = function(url, postdata, onload){
 			}
 			xmlhttp = onload = null;
 		};
-		xmlhttp.open((postdata !== null ? 'POST' : 'GET'), url, true);
+		xmlhttp.open((method !== undefined ? method : (postdata !== null ? 'POST' : 'GET')), url, true);
 		if (postdata !== null) {
-			xmlhttp.setRequestHeader('Content-Type', 'text/plain; charset=UTF-8');
+			xmlhttp.setRequestHeader('Content-Type', (contenttype !== undefined ? contenttype : 'text/plain; charset=UTF-8'));
 		}
 		xmlhttp.send(postdata !== null ? postdata : null);
 	} catch (e) {}
