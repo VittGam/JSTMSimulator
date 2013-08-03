@@ -131,11 +131,11 @@ adminapp.use(express.logger('[admin] :remote-addr - ":user" [:date] ":method :ur
 adminapp.use(express.basicAuth('admin', 'admin', 'JSTMSimulator Contest Admin'));
 adminapp.use(express.json());
 
-userapp.get('/glyphicons-halflings.png', function(req, res){
+adminapp.get('/glyphicons-halflings.png', function(req, res){
 	res.sendfile(path.join(__dirname, 'lib', 'bootstrap', 'img', 'glyphicons-halflings.png'));
 });
 
-userapp.get('/glyphicons-halflings-white.png', function(req, res){
+adminapp.get('/glyphicons-halflings-white.png', function(req, res){
 	res.sendfile(path.join(__dirname, 'lib', 'bootstrap', 'img', 'glyphicons-halflings-white.png'));
 });
 
