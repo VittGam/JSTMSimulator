@@ -23,6 +23,7 @@ var db = new sqlite3.Database(dbname);
 var jstmsimulatorGif = fs.readFileSync(path.join(__dirname, '..', 'out', 'jstmsimulator.gif'));
 var licenseText = fs.readFileSync(path.join(__dirname, '..', 'LICENSE'));
 var cssStyle = fs.readFileSync(path.join(__dirname, '..', 'lib', 'style.css'));
+var htmlheadHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'htmlhead.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
 var iecsshacksHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'iecsshacks.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
 var turingMachineHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'TuringMachine.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
 var turingMachineJS = fs.readFileSync(path.join(__dirname, '..', 'lib', 'TuringMachine.js'));
@@ -175,7 +176,7 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 			preloadedProblems.push({name: currproblem.name, code: currcode});
 			fs.writeFileSync(path.join(resultsDirName, row.username, 'progs', currproblem.id + '.t'), currcode);
 		});
-		fs.writeFileSync(path.join(resultsDirName, row.username, 'index.html'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>JSTMSimulator by VittGam</title><style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode displayresults">' + contestTableHtml + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + handleHTMLPageJS + 'var preloadedProblems = '+JSON.stringify(preloadedProblems)+';' + handlePreloadedProblemsJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
+		fs.writeFileSync(path.join(resultsDirName, row.username, 'index.html'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>JSTMSimulator by VittGam</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode displayresults">' + contestTableHtml + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + handleHTMLPageJS + 'var preloadedProblems = '+JSON.stringify(preloadedProblems)+';' + handlePreloadedProblemsJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
 		fs.writeFileSync(path.join(resultsDirName, row.username, 'jstmsimulator.gif'), jstmsimulatorGif);
 
 		// TODO creare htpasswd e htaccess qui. l'username sta in row.username e la password sta in row.password
