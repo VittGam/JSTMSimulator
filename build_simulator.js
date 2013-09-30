@@ -1,8 +1,9 @@
 /*
  * JSTMSimulator - A Turing Machine simulator written in JavaScript.
  * Copyright (C) 2013 VittGam.net. All Rights Reserved.
- * http://JSTMSimulator.VittGam.net/
- * https://github.com/VittGam/JSTMSimulator
+ * http://www.turingsimulator.net/
+ *
+ * See http://www.turingsimulator.net/github for source code.
  *
  * Please see the attached LICENSE file for licensing information.
  */
@@ -21,5 +22,5 @@ var turingMachineJS = fs.readFileSync(path.join(__dirname, 'lib', 'TuringMachine
 var i18nJS = fs.readFileSync(path.join(__dirname, 'lib', 'i18n.js'));
 var handleHTMLPageJS = fs.readFileSync(path.join(__dirname, 'lib', 'handleHTMLPage.js'));
 
-fs.writeFileSync(path.join(__dirname, 'out', 'jstmsimulator.htm'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>JSTMSimulator by VittGam</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body>' + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + handleHTMLPageJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
+fs.writeFileSync(path.join(__dirname, 'out', 'jstmsimulator.htm'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Simulator by VittGam</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body>' + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + handleHTMLPageJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
 

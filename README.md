@@ -8,7 +8,7 @@ For the machine syntax, I'm going to write it in the wiki. In the meantime, plea
 
 ## Online Version
 
-You can find it on http://JSTMSimulator.VittGam.net/.
+You can find it on http://www.turingsimulator.net/.
 
 ## How to compile
 
@@ -74,7 +74,7 @@ You'll find them in `server/results/GENERATION_TIMESTAMP`.
 - Contest admin interface interactivity (to add problems, users and testcases on-the-fly)
 - htaccess and htpasswd generation in server/build_results.js
 
-Any suggestion? Please create an issue or a pull request, or drop me a line at `jstmsimulator {at} vittgam {dot} net`. Thanks!
+Any suggestion? Please create an issue or a pull request, or drop me a line at `vittgam {at} turingsimulator {dot} net`. Thanks!
 
 ## License
 
