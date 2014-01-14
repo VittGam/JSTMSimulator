@@ -1,6 +1,6 @@
 /*
  * JSTMSimulator - A Turing Machine simulator written in JavaScript.
- * Copyright (C) 2013 VittGam.net. All Rights Reserved.
+ * Copyright (C) 2014 VittGam.net. All Rights Reserved.
  * http://www.turingsimulator.net/
  *
  * See http://www.turingsimulator.net/github for source code.
@@ -24,7 +24,7 @@ if (!fs.existsSync(dbname)) {
 }
 var db = new sqlite3.Database(dbname);
 
-var licenseText = fs.readFileSync(path.join(__dirname, '..', 'LICENSE'));
+var licenseText = fs.readFileSync(path.join(__dirname, 'LICENSE'));
 var cssStyle = fs.readFileSync(path.join(__dirname, '..', 'lib', 'style.css'));
 var htmlheadHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'htmlhead.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
 var iecsshacksHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'iecsshacks.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');

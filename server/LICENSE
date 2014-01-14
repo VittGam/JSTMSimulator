@@ -7,6 +7,10 @@ See http://www.turingsimulator.net/github for source code.
 
 JSTMSimulator is licensed under the MIT license.
 
+This product includes JSON3 code (http://bestiejs.github.com/json3) that
+is Copyright (C) 2014 Kit Cambridge and is also licensed under the MIT license.
+
+
 The MIT license text follows:
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
