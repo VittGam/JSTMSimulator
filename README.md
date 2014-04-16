@@ -42,7 +42,7 @@ git submodule update
 Then you'll also need to install the following NodeJS modules:
 
 - `async`
-- `express`
+- `express@3.5.1` (the server isn't compatible with express 4.x for now)
 - `sanitizer`
 - `sqlite3`
 
