@@ -31,6 +31,8 @@ var xmlhttpfuncJS = fs.readFileSync(path.join(__dirname, 'lib', 'xmlhttpfunc.js'
 var serverConfigJS = fs.readFileSync(path.join(__dirname, 'config.js'));
 eval(serverConfigJS.toString());
 
+express.logger.token('user', function(req, res){return req.user});
+
 var adminapp = express();
 adminapp.listen(serverConfig.adminServer.bindPort, serverConfig.adminServer.bindHost);
 adminapp.use(express.logger('[admin] :remote-addr - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
