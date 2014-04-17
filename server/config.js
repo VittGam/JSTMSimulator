@@ -16,7 +16,7 @@ var serverConfig = {
 	adminServer: {
 		bindHost: '0.0.0.0',
 		bindPort: 8082,
-		username: 'admin'
+		username: 'admin',
 		password: 'admin'
 	}
 };
