@@ -22,7 +22,7 @@ if (!fs.existsSync(dbname)) {
 var db = new sqlite3.Database(dbname);
 
 var jstmsimulatorGif = fs.readFileSync(path.join(__dirname, '..', 'out', 'jstmsimulator.gif'));
-var licenseText = fs.readFileSync(path.join(__dirname, 'LICENSE'));
+var licenseText = fs.readFileSync(path.join(__dirname, '..', 'LICENSE'));
 var cssStyle = fs.readFileSync(path.join(__dirname, '..', 'lib', 'style.css'));
 var htmlheadHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'htmlhead.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
 var iecsshacksHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'iecsshacks.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
