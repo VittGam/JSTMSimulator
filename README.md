@@ -52,12 +52,19 @@ After you've done with the prerequisites, first create the database by editing a
 node server/init_contest_database.sample.js
 ```
 
-Then run:
+To start the contest server run:
 
 ```
 node server/server.js
 ```
 
+To start the admin server run:
+
+```
+node server/admin.js
+```
+
+You can configure the servers parameters in `server/config.js`.
 The contest server listens by default on `0.0.0.0:8081`, and the admin server on `0.0.0.0:8082`.
 The admin server default credentials are `admin:admin`.
 
