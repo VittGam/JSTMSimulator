@@ -71,7 +71,9 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 			throw new Error('select userdata failed');
 		}
 		if (!contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username]) {
-			userTimestamps[curruserdata.username] = curruserdata.timestamp;
+			if (!userTimestamps[curruserdata.username]) {
+				userTimestamps[curruserdata.username] = curruserdata.timestamp;
+			}
 			contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username] = {code: curruserdata.code};
 		}
 	});
