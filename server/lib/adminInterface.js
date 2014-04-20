@@ -190,7 +190,7 @@ xmlhttp('/ajax/getData?_r=' + encodeURIComponent(+(new Date())), null, function(
 
 		if (response.data.userdata) {
 			response.data.userdata.forEach(function(row){
-				addRowToTable(userdataTables[row.username], [problemNames[row.id], row.code, row.timestamp, 'actionlink']);
+				addRowToTable(userdataTables[row.username], [problemNames[row.id], row.code, new Date(row.timestamp).toString(), 'actionlink']);
 			});
 		}
 

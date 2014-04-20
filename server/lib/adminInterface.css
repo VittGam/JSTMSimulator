@@ -32,6 +32,10 @@
 	float: right;
 }
 
+h2 {
+	margin-top: 0;
+}
+
 a {
 	cursor: pointer;
 }
