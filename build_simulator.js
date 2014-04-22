@@ -23,4 +23,4 @@ var i18nJS = fs.readFileSync(path.join(__dirname, 'lib', 'i18n.js'));
 var handleHTMLPageJS = fs.readFileSync(path.join(__dirname, 'lib', 'handleHTMLPage.js'));
 
 fs.writeFileSync(path.join(__dirname, 'out', 'jstmsimulator.htm'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html manifest="cache.manifest" class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Simulator by VittGam</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body>' + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + handleHTMLPageJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
-
+fs.writeFileSync(path.join(__dirname, 'out', 'cache.manifest'), 'CACHE MANIFEST\n# Built on '+(new Date().toString())+'\nNETWORK:\n*\nCACHE:\njstmsimulator.gif\n');
