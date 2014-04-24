@@ -18,7 +18,7 @@ To get the sources you need to have Git installed on your computer.
 git clone git://github.com/VittGam/JSTMSimulator.git
 ```
 
-You'll need NodeJS (I'm using v0.8.20) with the following modules: (install with `npm install module_name`)
+You'll need NodeJS (I'm using v0.8.20) with the following modules:
 
 ```
 npm install uglifycss uglify-js
