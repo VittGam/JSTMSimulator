@@ -20,8 +20,9 @@ git clone git://github.com/VittGam/JSTMSimulator.git
 
 You'll need NodeJS (I'm using v0.8.20) with the following modules: (install with `npm install module_name`)
 
-- `uglifycss`
-- `uglify-js`
+```
+npm install uglifycss uglify-js
+```
 
 To compile the simulator just run:
 
@@ -33,6 +34,8 @@ You'll find the compiled simulator in `out/jstmsimulator.htm`.
 
 ## The contest server
 
+You can use this to run a Turing Machine Competition. The simulator and the evaluation use the same engine (and share the same bugs :P .)
+
 To run the contest server you need to get the JSON3 submodule:
 ```
 git submodule init
@@ -41,10 +44,11 @@ git submodule update
 
 Then you'll also need to install the following NodeJS modules:
 
-- `async`
-- `express@3.5.1` (the server isn't compatible with express 4.x for now)
-- `sanitizer`
-- `sqlite3`
+```
+npm install async express@3.5.1 sanitizer sqlite3
+```
+
+(The server isn't compatible with express 4.x for now.)
 
 After you've done with the prerequisites, first create the database by editing and running the file:
 
