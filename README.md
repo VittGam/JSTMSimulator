@@ -36,6 +36,8 @@ You'll find the compiled simulator in `out/jstmsimulator.htm`.
 
 You can use this to run a Turing Machine Competition. The simulator and the evaluation use the same engine (and share the same bugs :P .)
 
+All the commands should be run from the project root (not from the `server` subdirectory.)
+
 To run the contest server you need to get the JSON3 submodule:
 ```
 git submodule init
@@ -79,6 +81,12 @@ node server/build_results.js
 ```
 
 You'll find them in `server/results/GENERATION_TIMESTAMP`.
+
+You can use the `sqlite3` utility directly on the database, until a proper admin interface is implemented. :P
+
+```
+sqlite3 server/database.sqlite
+```
 
 ## TODO
 
