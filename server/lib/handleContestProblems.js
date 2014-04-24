@@ -24,7 +24,7 @@ if (contestProblems) {
 		// always ask for confirmation even if codeTextarea.value === '', so the user can still cancel and ctrl-z after deleting everything
 		if (contestProblems[curridx] && confirm(String(currlang.LOAD_CONFIRMATION).replace(new RegExp('{program_name}', 'g'), contestProblems[curridx].name))) {
 			disableInputs();
-			xmlhttp('/ajax/problem/' + encodeURIComponent(contestProblems[curridx].id) + '?_r=' + encodeURIComponent(+(new Date())), null, function(success, response){
+			xmlhttp('ajax/problem/' + encodeURIComponent(contestProblems[curridx].id) + '?_r=' + encodeURIComponent(+(new Date())), null, function(success, response){
 				if (success && response && response.success) {
 					codeTextarea.value = response.code || '';
 					alert(currlang.LOAD_RESULT_OK);
@@ -40,7 +40,7 @@ if (contestProblems) {
 		var curridx = progsSelect.selectedIndex;
 		if (contestProblems[curridx] && confirm(String(currlang.SAVE_CONFIRMATION).replace(new RegExp('{program_name}', 'g'), contestProblems[curridx].name))) {
 			disableInputs();
-			xmlhttp('/ajax/problem/' + encodeURIComponent(contestProblems[curridx].id) + '?_r=' + encodeURIComponent(+(new Date())), codeTextarea.value.replace(new RegExp('(?:\r\n|\r)', 'g'), '\n'), function(success, response){
+			xmlhttp('ajax/problem/' + encodeURIComponent(contestProblems[curridx].id) + '?_r=' + encodeURIComponent(+(new Date())), codeTextarea.value.replace(new RegExp('(?:\r\n|\r)', 'g'), '\n'), function(success, response){
 				if (success && response && response.success) {
 					alert(currlang.SAVE_RESULT_OK);
 				} else {

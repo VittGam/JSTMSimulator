@@ -21,7 +21,7 @@ doc.getElementById('navHomeLink').addEventListener('click', function(){
 	}
 	return false;
 }, false);
-xmlhttp('/ajax/getData?_r=' + encodeURIComponent(+(new Date())), null, function(success, response){
+xmlhttp('ajax/getData?_r=' + encodeURIComponent(+(new Date())), null, function(success, response){
 	if (success && response && response.success && response.data) {
 		var newnav = doc.createElement('ul');
 		newnav.className = 'nav nav-list';
