@@ -47,7 +47,7 @@ eval(serverConfigJS.toString());
 express.logger.token('user', function(req, res){return req.user});
 
 try {
-	process.title = 'node: JSTMServer, '+serverConfig.contestServer.bindPort+' '+serverConfig.contestServer.bindHost;
+	process.title = 'JSTMServer '+serverConfig.contestServer.bindPort+' '+serverConfig.contestServer.bindHost;
 } catch (e) {}
 
 var userapp = express();
