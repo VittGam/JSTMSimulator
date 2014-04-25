@@ -34,7 +34,7 @@ eval(serverConfigJS.toString());
 express.logger.token('user', function(req, res){return req.user});
 
 try {
-	process.title = 'nodejs: JSTMSimulator admin server, listening on '+serverConfig.adminServer.bindHost+':'+serverConfig.adminServer.bindPort;
+	process.title = 'node: JSTMAdmin, '+serverConfig.adminServer.bindPort+' '+serverConfig.adminServer.bindHost;
 } catch (e) {}
 
 var adminapp = express();
