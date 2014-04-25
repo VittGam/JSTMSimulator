@@ -46,6 +46,10 @@ eval(serverConfigJS.toString());
 
 express.logger.token('user', function(req, res){return req.user});
 
+try {
+	process.title = 'nodejs: JSTMSimulator server, listening on '+serverConfig.contestServer.bindHost+':'+serverConfig.contestServer.bindPort;
+} catch (e) {}
+
 var userapp = express();
 userapp.listen(serverConfig.contestServer.bindPort, serverConfig.contestServer.bindHost);
 userapp.use(express.logger('[user]  :remote-addr - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));

@@ -33,6 +33,10 @@ eval(serverConfigJS.toString());
 
 express.logger.token('user', function(req, res){return req.user});
 
+try {
+	process.title = 'nodejs: JSTMSimulator admin server, listening on '+serverConfig.adminServer.bindHost+':'+serverConfig.adminServer.bindPort;
+} catch (e) {}
+
 var adminapp = express();
 adminapp.listen(serverConfig.adminServer.bindPort, serverConfig.adminServer.bindHost);
 adminapp.use(express.logger('[admin] :remote-addr - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
