@@ -16,7 +16,10 @@ To get the sources you need to have Git installed on your computer.
 
 ```
 git clone git://github.com/VittGam/JSTMSimulator.git
+cd JSTMSimulator
 ```
+
+All the commands from now on should be run from the project root.
 
 You'll need NodeJS (I'm using v0.10.26) with the following modules:
 
