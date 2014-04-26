@@ -34,7 +34,9 @@ jsFiles.forEach(function(currfile){
 	});
 });
 
-jsToplevel = uglifyjs.parse('/*' + jsToplevel.start.comments_before[0].value + '*/(function(){$ORIGFUNC;})();', {
+var jsCopyrightComment = '/*' + jsToplevel.start.comments_before[0].value + '*/';
+
+jsToplevel = uglifyjs.parse(jsCopyrightComment + '(function(){$ORIGFUNC;})();', {
 	filename: '?',
 	toplevel: null
 }).transform(new uglifyjs.TreeTransformer(function(node){
@@ -64,10 +66,11 @@ minifiedJS2 += '\n//# sourceMappingURL=jstmsimulator.min.js.map';
 jsSourceMap = jsSourceMap.toString();
 
 var minifiedCSS = uglifycss(cssStyle);
+var minifiedCSS2 = jsCopyrightComment + minifiedCSS;
 
 // the \r\n replacement is just another IE 6 fix
 fs.writeFileSync(path.join(__dirname, 'out', 'index.htm'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html manifest="cache.minfiles.manifest" class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Simulator by VittGam</title>' + htmlheadHtml + '<link rel="stylesheet" type="text/css" href="jstmsimulator.min.css">' + iecsshacksHtml + '</head><body>' + turingMachineHtml + '<script src="jstmsimulator.min.js"></script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n'));
-fs.writeFileSync(path.join(__dirname, 'out', 'jstmsimulator.min.css'), ('/*\n' + licenseText + '*/' + minifiedCSS).replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n'));
+fs.writeFileSync(path.join(__dirname, 'out', 'jstmsimulator.min.css'), minifiedCSS2.replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n'));
 fs.writeFileSync(path.join(__dirname, 'out', 'jstmsimulator.min.js'), minifiedJS2.replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n'));
 fs.writeFileSync(path.join(__dirname, 'out', 'jstmsimulator.min.js.map'), jsSourceMap);
 fs.writeFileSync(path.join(__dirname, 'out', 'cache.minfiles.manifest'), 'CACHE MANIFEST\n# Built on '+(new Date().toString())+'\nNETWORK:\n*\nCACHE:\njstmsimulator.min.css\njstmsimulator.min.js\njstmsimulator.min.js.map\njstmsimulator.gif\n');
