@@ -36,10 +36,7 @@ jsFiles.forEach(function(currfile){
 
 var jsCopyrightComment = '/*' + jsToplevel.start.comments_before[0].value + '*/';
 
-jsToplevel = uglifyjs.parse(jsCopyrightComment + '(function(){$ORIGFUNC;})();', {
-	filename: '?',
-	toplevel: null
-}).transform(new uglifyjs.TreeTransformer(function(node){
+jsToplevel = uglifyjs.parse(jsCopyrightComment + '(function(){$ORIGFUNC;})();').transform(new uglifyjs.TreeTransformer(function(node){
 	if (node instanceof uglifyjs.AST_SimpleStatement && node.body && node.body instanceof uglifyjs.AST_SymbolRef && node.body.name === '$ORIGFUNC') {
 		return uglifyjs.MAP.splice(jsToplevel.body);
 	}
