@@ -43,7 +43,7 @@ jsToplevel = uglifyjs.parse(jsCopyrightComment + '(function(){$ORIGFUNC;})();').
 }));
 
 jsToplevel.figure_out_scope();
-var jsCompressor = uglifyjs.Compressor({warnings: false});
+var jsCompressor = uglifyjs.Compressor({warnings: false, unsafe: true});
 jsToplevel = jsToplevel.transform(jsCompressor);
 jsToplevel.figure_out_scope();
 jsToplevel.compute_char_frequency();
