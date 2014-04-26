@@ -3,4 +3,7 @@ CACHE MANIFEST
 NETWORK:
 *
 CACHE:
+jstmsimulator.min.css
+jstmsimulator.min.js
+jstmsimulator.min.js.map
 jstmsimulator.gif
