@@ -39,7 +39,7 @@ try {
 
 var adminapp = express();
 adminapp.listen(serverConfig.adminServer.bindPort, serverConfig.adminServer.bindHost);
-adminapp.use(express.logger('[admin] :remote-addr - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
+adminapp.use(express.logger('[admin] :remote-addr :req[x-real-ip-ok] - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
 adminapp.use(express.basicAuth(serverConfig.adminServer.username, serverConfig.adminServer.password, 'JSTMSimulator Contest Admin'));
 adminapp.use(express.json());
 

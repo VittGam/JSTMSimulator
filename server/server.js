@@ -52,7 +52,7 @@ try {
 
 var userapp = express();
 userapp.listen(serverConfig.contestServer.bindPort, serverConfig.contestServer.bindHost);
-userapp.use(express.logger('[user]  :remote-addr - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
+userapp.use(express.logger('[user]  :remote-addr :req[x-real-ip-ok] - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
 userapp.use(express.basicAuth(function(username, password, callback){
 	db.get('SELECT username, password FROM users WHERE username = ? AND password = ?', username, password, function(err, row){
 		if (!err && row && row.username === username && row.password === password) {
@@ -61,7 +61,7 @@ userapp.use(express.basicAuth(function(username, password, callback){
 			callback(true, null);
 		}
 	});
-}, 'Benvenuto nella gara sulla Macchina di Turing; inserisci le tue credenziali di accesso per continuare'));
+}, 'Benvenuto alla Gara di programmazione della Macchina di Turing; inserisci le tue credenziali di accesso per continuare'));
 
 userapp.get('/', function(req, res){
 	res.type('html');
