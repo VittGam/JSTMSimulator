@@ -37,6 +37,14 @@ eval(turingMachineJS.toString());
 eval(i18nJS.toString());
 var currlang = lang.it;
 
+var getLastSaveTime = function(lastsavedate) {
+	var lastsavehour = lastsavedate.getHours();
+	if (isNaN(lastsavehour)) return 'Mai';
+	var lastsavemins = lastsavedate.getMinutes();
+	var lastsavesecs = lastsavedate.getSeconds();
+	return (lastsavehour < 10 ? '0' : '') + lastsavehour + ':' + (lastsavemins < 10 ? '0' : '') + lastsavemins + ':' + (lastsavesecs < 10 ? '0' : '') + lastsavesecs;
+};
+
 var resultsDirName = path.join(__dirname, 'results', String(+(new Date())));
 if (!fs.existsSync(path.join(__dirname, 'results'))) {
 	fs.mkdirSync(path.join(__dirname, 'results'));
@@ -52,6 +60,8 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 	}
 	var problemMap = {};
 	var userTimestamps = {};
+	var lastTimestamp = null;
+	var userPoints = {};
 	contestProblems.forEach(function(i, j){
 		problemMap[i.id] = j;
 		i.testcases = [];
@@ -73,6 +83,9 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 		if (!contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username]) {
 			if (!userTimestamps[curruserdata.username]) {
 				userTimestamps[curruserdata.username] = curruserdata.timestamp;
+			}
+			if (!lastTimestamp) {
+				lastTimestamp = curruserdata.timestamp;
 			}
 			contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username] = {code: curruserdata.code};
 		}
@@ -144,10 +157,7 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 		//console.dir(contestProblems);
 
 		var lastsavedate = new Date(userTimestamps[row.username]);
-		var lastsavehour = lastsavedate.getHours();
-		var lastsavemins = lastsavedate.getMinutes();
-		var lastsavesecs = lastsavedate.getSeconds();
-		var lastsavetime = (lastsavehour < 10 ? '0' : '') + lastsavehour + ':' + (lastsavemins < 10 ? '0' : '') + lastsavemins + ':' + (lastsavesecs < 10 ? '0' : '') + lastsavesecs;
+		var lastsavetime = getLastSaveTime(lastsavedate);
 		var contestTableHtml = '<div id="results"><h1 align="center">Verifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><p>Per provare usare il <a href="#simulator">simulatore</a> pre-caricato con i problemi della squadra \'<i>'+sanitizer.escape(String(row.username))+'</i>\'.</p><h2>Sommario ('+points+' punt'+(points === 1 ? 'o' : 'i')+', ultimo salvataggio '+lastsavetime+')</h2><table border="1">';
 		contestProblems.forEach(function(currproblem, j){
 			contestTableHtml += '<tr><td><a'+(currproblem.testcases.length > 0 ? ' href="#'+sanitizer.escape(String(currproblem.id))+'"' : '')+'>'+sanitizer.escape(String(currproblem.name))+'</a> (<a href="progs/'+sanitizer.escape(String(currproblem.id))+'.t">download</a>)</td><td>'+(currproblem.testcases.length > 0 ? (currproblem.userdata[row.username].success ? 'OK' : 'FAIL') : 'N/A')+'</td><td>'+(currproblem.testcases.length > 0 ? currproblem.points : 'N/A')+'</td></tr>';
@@ -182,10 +192,36 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 		fs.writeFileSync(path.join(resultsDirName, row.username, 'index.html'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Competition Results</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode displayresults">' + contestTableHtml + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + handleHTMLPageJS + 'var preloadedProblems = '+JSON.stringify(preloadedProblems)+';' + handlePreloadedProblemsJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
 		fs.writeFileSync(path.join(resultsDirName, row.username, 'jstmsimulator.gif'), jstmsimulatorGif);
 
+		userPoints[row.username] = points;
+
 		// TODO creare htpasswd e htaccess qui. l'username sta in row.username e la password sta in row.password
 
 		console.log('');
 	}, function(){
+		var lastsavedate = new Date(lastTimestamp);
+		var lastsavetime = getLastSaveTime(lastsavedate);
+		var contestTableHtml = '<div id="results"><h1 align="center">Classifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><h2>Ultimo salvataggio globale: '+lastsavetime+'</h2><table border="1"><tr><th>Posizione</th><th>Nome utente</th><th>Punteggio</th><th>Ultimo salvataggio</th></tr>';
+		Object.keys(userTimestamps).sort(function(a, b){
+			if (userPoints[a] != userPoints[b]) {
+				return userPoints[b] - userPoints[a];
+			}
+			if (!isNaN(userTimestamps[a]) && !isNaN(userTimestamps[b])) {
+				return userTimestamps[a] - userTimestamps[b];
+			}
+			if (isNaN(userTimestamps[a]) && !isNaN(userTimestamps[b])) {
+				return b;
+			}
+			if (isNaN(userTimestamps[b]) && !isNaN(userTimestamps[a])) {
+				return a;
+			}
+			return a < b;
+		}).forEach(function(currusername, j){
+			contestTableHtml += '<tr><td>'+(j+1)+'°</td><td><a href="'+sanitizer.escape(String(currusername))+'">'+sanitizer.escape(String(currusername))+'</a></td><td>'+userPoints[currusername]+'</td><td>'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'</td></tr>';
+		});
+		contestTableHtml += '</table>';
+
+		fs.writeFileSync(path.join(resultsDirName, 'index.html'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Competition Results</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode displayresults">' + contestTableHtml + '</body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
+
 		console.log('Results written into ' + resultsDirName);
 	});
 });
