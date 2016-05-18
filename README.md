@@ -1,6 +1,6 @@
 # JSTMSimulator
 
-A Turing Machine simulator written in JavaScript. It should work on Chrome and Firefox, as well as IE 6 through 10. Testing by the developer is usually done on Chrome and IE 6.
+A Turing Machine simulator written in JavaScript. It should work on Chrome and Firefox, as well as IE 6 through 10. Testing by the developer is usually done on Firefox and IE 6.
 
 This simulator has been written from scratch and it's based on the design and functionality of the Java simulator developed by Antonio Cisternino (http://mdt.di.unipi.it/TMSimulatore/TMSimulator-1.2.zip).
 
@@ -8,7 +8,7 @@ For the machine syntax, I'm going to write it in the wiki. In the meantime, plea
 
 ## Online Version
 
-You can find it on http://www.turingsimulator.net/.
+You can find it on https://www.turingsimulator.net/.
 
 ## How to compile
 

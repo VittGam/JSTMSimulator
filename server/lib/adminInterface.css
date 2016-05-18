@@ -1,9 +1,9 @@
 /*
  * JSTMSimulator - A Turing Machine simulator written in JavaScript.
- * Copyright (C) 2014 VittGam.net. All Rights Reserved.
- * http://www.turingsimulator.net/
+ * Copyright (C) 2016 VittGam.net. All Rights Reserved.
+ * https://www.turingsimulator.net/
  *
- * See http://www.turingsimulator.net/github for source code.
+ * See https://www.turingsimulator.net/github for source code.
  *
  * Please see the attached LICENSE file for licensing information.
  */
