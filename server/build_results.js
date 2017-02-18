@@ -94,6 +94,11 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 		if (!(!err && row)) {
 			throw new Error('select users failed');
 		}
+
+		if (!userTimestamps.hasOwnProperty(row.username)) {
+			return;
+		}
+
 		var points = 0;
 		contestProblems.forEach(function(currproblem){
 			if (currproblem.testcases.length < 1) {
