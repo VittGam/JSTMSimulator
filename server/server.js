@@ -61,7 +61,7 @@ userapp.use(express.basicAuth(function(username, password, callback){
 			callback(true, null);
 		}
 	});
-}, 'Benvenuto alla Gara di programmazione della Macchina di Turing; inserisci le tue credenziali di accesso per continuare'));
+}, serverConfig.contestServer.authRealm));
 
 userapp.get('/', function(req, res){
 	res.type('html');
