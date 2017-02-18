@@ -28,7 +28,7 @@ var licenseText = fs.readFileSync(path.join(__dirname, 'LICENSE'));
 var cssStyle = fs.readFileSync(path.join(__dirname, '..', 'lib', 'style.css'));
 var htmlheadHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'htmlhead.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
 var iecsshacksHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'iecsshacks.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
-var turingMachineHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'TuringMachine.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '');
+var turingMachineHtml = fs.readFileSync(path.join(__dirname, '..', 'lib', 'TuringMachine.htm')).toString().replace(new RegExp('(?:\\n|\\r|\\t)', 'g'), '').replace('<div id="status"><a href="https://www.turingsimulator.net/">Turing Machine Simulator</a> by <a href="https://www.vittgam.net/">VittGam</a></div>', '<div id="status">Turing Machine Simulator by VittGam</div>');
 var json3JS = fs.readFileSync(path.join(__dirname, 'lib', 'json3', 'lib', 'json3.js'));
 var turingMachineJS = fs.readFileSync(path.join(__dirname, '..', 'lib', 'TuringMachine.js'));
 var i18nJS = fs.readFileSync(path.join(__dirname, '..', 'lib', 'i18n.js'));
