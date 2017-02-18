@@ -22,6 +22,8 @@ if (exists) {
 
 	var db = new sqlite3.Database(dbname);
 	db.serialize(function(){
+		db.run('begin transaction');
+
 		db.run('CREATE TABLE users (username TEXT UNIQUE NOT NULL, password TEXT NOT NULL)');
 		db.run('CREATE TABLE problems (id TEXT UNIQUE NOT NULL, name TEXT UNIQUE NOT NULL, points INT)');
 		db.run('CREATE TABLE userdata (id TEXT NOT NULL, username TEXT NOT NULL, code TEXT, timestamp INT)');
@@ -58,5 +60,7 @@ if (exists) {
 
 		stmt.finalize();
 		stmt = null;
+
+		db.run('commit');
 	});
 }
