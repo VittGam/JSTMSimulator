@@ -113,7 +113,7 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 			curruserproblem.error = false;
 			curruserproblem.testcases = [];
 			curruserproblem.successcount = 0;
-			currproblem.testcases.some(function(currrawproblem, j){
+			currproblem.testcases.some(function(currrawproblem){
 				var currtestcase = [];
 				currtestcase.initialtape = currrawproblem.initialtape;
 				currtestcase.expectedtape = currrawproblem.expectedtape;
@@ -163,22 +163,35 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 
 		var lastsavedate = new Date(userTimestamps[row.username]);
 		var lastsavetime = getLastSaveTime(lastsavedate);
-		var contestTableHtml = '<div id="results"><h1 align="center">Verifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><p>Per provare usare il <a href="#simulator">simulatore</a> pre-caricato con i problemi della squadra \'<i>'+sanitizer.escape(String(row.username))+'</i>\'.</p><h2>Sommario ('+points+' punt'+(points === 1 ? 'o' : 'i')+', ultimo salvataggio '+lastsavetime+')</h2><table border="1">';
-		contestProblems.forEach(function(currproblem, j){
-			contestTableHtml += '<tr><td><a'+(currproblem.testcases.length > 0 ? ' href="#'+sanitizer.escape(String(currproblem.id))+'"' : '')+'>'+sanitizer.escape(String(currproblem.name))+'</a> (<a href="progs/'+sanitizer.escape(String(currproblem.id))+'.t">download</a>)</td><td>'+(currproblem.testcases.length > 0 ? (currproblem.userdata[row.username].success ? 'OK' : 'FAIL') : 'N/A')+'</td><td>'+(currproblem.testcases.length > 0 ? currproblem.points : 'N/A')+'</td></tr>';
+		var contestTableHtml = '<div id="results"><h1 align="center">Verifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><p>Per provare usare il <a href="#simulator">simulatore</a> pre-caricato con i problemi della squadra \'<i>'+sanitizer.escape(String(row.username))+'</i>\'.</p><h2>Sommario ('+points+' punt'+(points === 1 ? 'o' : 'i')+', ultimo salvataggio '+lastsavetime+')</h2><table border="1"><tr><th>Problem</th><th>Points</th><th>Result</th><th>Count</th></tr>';
+		contestProblems.forEach(function(currproblem){
+			contestTableHtml += '<tr><td><a';
+			if (currproblem.testcases.length > 0) {
+				contestTableHtml += ' href="#'+sanitizer.escape(String(currproblem.id))+'"';
+			}
+			contestTableHtml += '>'+sanitizer.escape(String(currproblem.name))+'</a> (<a href="progs/'+sanitizer.escape(String(currproblem.id))+'.t">download</a>)</td>';
+			if (currproblem.testcases.length > 0) {
+				contestTableHtml += '<td>' + currproblem.points + '</td>';
+				var xcolor = (currproblem.userdata[row.username].success ? 'green' : (currproblem.userdata[row.username].successcount > 0 ? 'yellow' : 'red'));
+				contestTableHtml += '<td class="' + xcolor + '">' + (currproblem.userdata[row.username].success ? 'OK' : 'FAIL') + '</td>';
+				contestTableHtml += '<td class="' + xcolor + '">' + currproblem.userdata[row.username].successcount + '/' + currproblem.testcases.length + '</td>';
+			} else {
+				contestTableHtml += '<td>N/A</td><td>N/A</td><td>N/A</td>';
+			}
+			contestTableHtml += '</tr>';
 		});
 		contestTableHtml += '</table>';
-		contestProblems.forEach(function(currproblem, j){
+		contestProblems.forEach(function(currproblem){
 			if (currproblem.testcases.length < 1) {
 				return;
 			}
 			var curruserproblem = currproblem.userdata[row.username];
-			contestTableHtml += '<h2><a name="'+sanitizer.escape(String(currproblem.id))+'">'+sanitizer.escape(String(currproblem.name))+'</a> ('+currproblem.points+' punt'+(currproblem.points === 1 ? 'o' : 'i')+')</h2><table border="1"><tr><td>Outcome</td><td>Input</td><td>Output</td><td>Atteso</td><td>Passi</td><td>Risultato</td></tr>';
+			contestTableHtml += '<h2><a name="'+sanitizer.escape(String(currproblem.id))+'">'+sanitizer.escape(String(currproblem.name))+'</a> ('+currproblem.points+' punt'+(currproblem.points === 1 ? 'o' : 'i')+')</h2><table border="1"><tr><th>Outcome</th><th>Input</th><th>Output</th><th>Atteso</th><th>Passi</th><th>Risultato</th></tr>';
 			if (curruserproblem.error) {
-				contestTableHtml += '<tr><td colspan="6"><font color="#ff0000">'+sanitizer.escape(String((curruserproblem.error.errorType === 'syntax' ? String(currlang.SYNTAX_ERROR_LABEL).replace('%d', curruserproblem.error.errorLine + 1) : currlang.UNKNOWN_ERROR_LABEL) + ' ' + currlang[curruserproblem.error.errorMessage]))+'</font></td></tr>';
+				contestTableHtml += '<tr><td colspan="6" style="color:#f00">'+sanitizer.escape(String((curruserproblem.error.errorType === 'syntax' ? String(currlang.SYNTAX_ERROR_LABEL).replace('%d', curruserproblem.error.errorLine + 1) : currlang.UNKNOWN_ERROR_LABEL) + ' ' + currlang[curruserproblem.error.errorMessage]))+'</td></tr>';
 			} else {
 				curruserproblem.testcases.forEach(function(currtestcase){
-					contestTableHtml += '<tr><td>'+sanitizer.escape(String(currtestcase.outcome))+'</td><td class="codecell">'+sanitizer.escape(String(currtestcase.initialtape))+'</td><td class="codecell">'+sanitizer.escape(String(currtestcase.finaltape))+'</td><td class="codecell">'+sanitizer.escape(String(currtestcase.expectedtape))+'</td><td>'+currtestcase.steps+'</td><td>'+(currtestcase.success ? 'OK' : 'FAIL')+'</td></tr>';
+					contestTableHtml += '<tr><td>'+sanitizer.escape(String(currtestcase.outcome))+'</td><td class="codecell">'+sanitizer.escape(String(currtestcase.initialtape))+'</td><td class="codecell">'+sanitizer.escape(String(currtestcase.finaltape))+'</td><td class="codecell">'+sanitizer.escape(String(currtestcase.expectedtape))+'</td><td>'+currtestcase.steps+'</td><td class="'+(currtestcase.success ? 'green' : 'red')+'">'+(currtestcase.success ? 'OK' : 'FAIL')+'</td></tr>';
 				});
 			}
 			contestTableHtml += '</table>';
@@ -205,7 +218,14 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 	}, function(){
 		var lastsavedate = new Date(lastTimestamp);
 		var lastsavetime = getLastSaveTime(lastsavedate);
-		var contestTableHtml = '<div id="results"><h1 align="center">Classifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><h2>Ultimo salvataggio globale: '+lastsavetime+'</h2><table border="1"><tr><th>Posizione</th><th>Nome utente</th><th>Punteggio</th><th>Ultimo salvataggio</th></tr>';
+		var contestTableHtml = '<div id="results"><h1 align="center">Classifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><h2>Ultimo salvataggio globale: '+lastsavetime+'</h2><table border="1"><tr><th>Posizione</th><th>Nome utente</th><th>Punteggio</th><th>Ultimo salvataggio</th>';
+		var contestCSV = '"Nome utente";"Posizione";"Punteggio";"Ultimo salvataggio"\n';
+		contestProblems.forEach(function(currproblem){
+			if (currproblem.testcases.length > 0) {
+				contestTableHtml += '<th class="prob">' + sanitizer.escape(String(currproblem.name)) + '</th>';
+			}
+		});
+		contestTableHtml += '</tr>';
 		Object.keys(userTimestamps).sort(function(a, b){
 			if (userPoints[a] != userPoints[b]) {
 				return userPoints[b] - userPoints[a];
@@ -219,13 +239,21 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 			if (isNaN(userTimestamps[b]) && !isNaN(userTimestamps[a])) {
 				return a;
 			}
-			return a < b;
+			return a < b ? -1 : 1;
 		}).forEach(function(currusername, j){
-			contestTableHtml += '<tr><td>'+(j+1)+'°</td><td><a href="'+sanitizer.escape(String(currusername))+'">'+sanitizer.escape(String(currusername))+'</a></td><td>'+userPoints[currusername]+'</td><td>'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'</td></tr>';
+			contestTableHtml += '<tr><td>'+(j+1)+'°</td><td><a href="'+sanitizer.escape(String(currusername))+'">'+sanitizer.escape(String(currusername))+'</a></td><td>'+userPoints[currusername]+'</td><td>'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'</td>';
+			contestCSV += '"' + sanitizer.escape(String(currusername)) + '","'+(j+1)+'","'+userPoints[currusername]+'","'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'"\n';
+			contestProblems.forEach(function(currproblem){
+				if (currproblem.testcases.length > 0) {
+					contestTableHtml += '<td class="prob ' + (currproblem.userdata[currusername].success ? 'green' : (currproblem.userdata[currusername].successcount > 0 ? 'yellow' : 'red')) + '">' + currproblem.userdata[currusername].successcount + '/' + currproblem.testcases.length + '</td>';
+				}
+			});
+			contestTableHtml += '</tr>';
 		});
-		contestTableHtml += '</table>';
+		contestTableHtml += '</table></div>';
 
 		fs.writeFileSync(path.join(resultsDirName, 'index.html'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Competition Results</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode displayresults">' + contestTableHtml + '</body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
+		fs.writeFileSync(path.join(resultsDirName, 'index.csv'), contestCSV);
 
 		console.log('Results written into ' + resultsDirName);
 	});

@@ -294,6 +294,25 @@ body.loadmode.savemode #loadbtn {
 	height: 64px;
 	z-index: 4;
 }
+body.displayresults #results th {
+	text-align: left;
+}
+body.displayresults #results th.prob {
+	text-align: right;
+	font-size: smaller;
+}
+body.displayresults #results td.prob {
+	text-align: right;
+}
+body.displayresults #results .green {
+	background-color: #90ee90;
+}
+body.displayresults #results .yellow {
+	background-color: #eeee90;
+}
+body.displayresults #results .red {
+	background-color: #ee9090;
+}
 body.displayresults #results td.codecell {
 	font-family: "monospace",monospace;
 	white-space: pre;
