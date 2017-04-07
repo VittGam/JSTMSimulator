@@ -59,6 +59,20 @@ userapp.use(express.basicAuth(function(username, password, callback){
 	}
 }, serverConfig.contestServer.authRealm));
 
+userapp.use(function(req, res, next){
+	res.header('X-Content-Type-Options', 'nosniff');
+	if (req.path === '/jstmsimulator.gif') {
+		res.header('Cache-Control', 'private, must-revalidate, post-check=0, pre-check=0');
+	} else if (req.path !== '/favicon.ico') {
+		res.header({
+			'Cache-Control': 'private, no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+			'Pragma': 'no-cache',
+			'Expires': 'Thu, 25 May 1995 21:16:00 GMT',
+		});
+	}
+	next();
+});
+
 userapp.get('/', function(req, res){
 	res.type('html');
 	res.send(200, finalHTML);
@@ -114,4 +128,3 @@ userapp.get('/favicon.ico', function(req, res){
 userapp.get('*', function(req, res){
 	res.redirect('/');
 });
-
