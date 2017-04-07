@@ -37,6 +37,9 @@ eval(turingMachineJS.toString());
 eval(i18nJS.toString());
 var currlang = lang.it;
 
+var serverConfigJS = fs.readFileSync(path.join(__dirname, 'config.js'));
+eval(serverConfigJS.toString());
+
 var getLastSaveTime = function(lastsavedate) {
 	var lastsavehour = lastsavedate.getHours();
 	if (isNaN(lastsavehour)) return 'Mai';
@@ -54,46 +57,46 @@ console.log('Output dir: ' + resultsDirName);
 console.log('');
 
 db.serialize();
-db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
-	if (!(!err && contestProblems)) {
-		throw new Error('select problems failed');
+var contestProblems = [];
+Object.keys(serverConfig.problems).forEach(function(i){ // FIXME!!!
+	contestProblems.push({id: i, name: serverConfig.problems[i][0], points: serverConfig.problems[i][1]});
+});
+var problemMap = {};
+var userTimestamps = {};
+var lastTimestamp = null;
+var userPoints = {};
+contestProblems.forEach(function(i, j){
+	problemMap[i.id] = j;
+	i.testcases = [];
+	i.userdata = {};
+});
+Object.keys(serverConfig.testcases).forEach(function(i){ // FIXME!!!
+	if (!(typeof problemMap[i] === 'number' && contestProblems[problemMap[i]])) {
+		throw new Error('select testcases failed');
 	}
-	var problemMap = {};
-	var userTimestamps = {};
-	var lastTimestamp = null;
-	var userPoints = {};
-	contestProblems.forEach(function(i, j){
-		problemMap[i.id] = j;
-		i.testcases = [];
-		i.userdata = {};
-	});
-	db.each('SELECT id, initialtape, expectedtape FROM testcases', function(err, currtestcase){
-		if (!(!err && currtestcase && typeof problemMap[currtestcase.id] === 'number' && contestProblems[problemMap[currtestcase.id]])) {
-			throw new Error('select testcases failed');
-		}
-		contestProblems[problemMap[currtestcase.id]].testcases.push({
-			initialtape: String(currtestcase.initialtape).toUpperCase(),
-			expectedtape: String(currtestcase.expectedtape).toUpperCase().replace(new RegExp('^ *(.*?) *$'), '$1')
+	serverConfig.testcases[i].forEach(function(j){
+		contestProblems[problemMap[i]].testcases.push({
+			initialtape: String(j[0]).toUpperCase(),
+			expectedtape: String(j[1]).toUpperCase().replace(new RegExp('^ *(.*?) *$'), '$1')
 		});
 	});
-	db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp DESC', function(err, curruserdata){
-		if (!(!err && curruserdata && typeof problemMap[curruserdata.id] === 'number' && contestProblems[problemMap[curruserdata.id]])) {
-			throw new Error('select userdata failed');
+});
+db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp DESC', function(err, curruserdata){
+	if (!(!err && curruserdata && typeof problemMap[curruserdata.id] === 'number' && contestProblems[problemMap[curruserdata.id]])) {
+		throw new Error('select userdata failed');
+	}
+	if (!contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username]) {
+		if (!userTimestamps[curruserdata.username]) {
+			userTimestamps[curruserdata.username] = curruserdata.timestamp;
 		}
-		if (!contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username]) {
-			if (!userTimestamps[curruserdata.username]) {
-				userTimestamps[curruserdata.username] = curruserdata.timestamp;
-			}
-			if (!lastTimestamp) {
-				lastTimestamp = curruserdata.timestamp;
-			}
-			contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username] = {code: curruserdata.code};
+		if (!lastTimestamp) {
+			lastTimestamp = curruserdata.timestamp;
 		}
-	});
-	db.each('SELECT username, password FROM users', function(err, row){
-		if (!(!err && row)) {
-			throw new Error('select users failed');
-		}
+		contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username] = {code: curruserdata.code};
+	}
+}, function(){
+	Object.keys(serverConfig.users).forEach(function(i){
+		var row = {username: i, password: serverConfig.users[i]}; // FIXME!!!
 
 		if (!userTimestamps.hasOwnProperty(row.username)) {
 			return;
@@ -136,7 +139,7 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 					}
 				});
 				currtestcase.instance.start();
-				while (currtestcase.instance.stepcount <= 100000 && currtestcase.instance.tick());
+				while (currtestcase.instance.stepcount <= serverConfig.maxsteps && currtestcase.instance.tick());
 				currtestcase.steps = currtestcase.instance.stepcount;
 				currtestcase.endstate = currtestcase.instance.currstate;
 				currtestcase.finaltape = String(currtestcase.instance.tapetext).replace(new RegExp('^ *(.*?) *$'), '$1');
@@ -144,7 +147,8 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 				if (curruserproblem.error) {
 					return true;
 				}
-				if (currtestcase.outcome !== 'Run' && currtestcase.steps > 100000) {
+				if (currtestcase.outcome !== 'Run' && currtestcase.steps > serverConfig.maxsteps) {
+					console.log('Timeout!');
 					currtestcase.outcome = 'Timeout';
 				} else if (currtestcase.outcome === 'Run' && currtestcase.finaltape === currtestcase.expectedtape) {
 					currtestcase.success = true;
@@ -215,46 +219,45 @@ db.all('SELECT id, name, points FROM problems', function(err, contestProblems){
 		// TODO creare htpasswd e htaccess qui. l'username sta in row.username e la password sta in row.password
 
 		console.log('');
-	}, function(){
-		var lastsavedate = new Date(lastTimestamp);
-		var lastsavetime = getLastSaveTime(lastsavedate);
-		var contestTableHtml = '<div id="results"><h1 align="center">Classifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><h2>Ultimo salvataggio globale: '+lastsavetime+'</h2><table border="1"><tr><th>Posizione</th><th>Nome utente</th><th>Punteggio</th><th>Ultimo salvataggio</th>';
-		var contestCSV = '"Nome utente";"Posizione";"Punteggio";"Ultimo salvataggio"\n';
+	});
+	var lastsavedate = new Date(lastTimestamp);
+	var lastsavetime = getLastSaveTime(lastsavedate);
+	var contestTableHtml = '<div id="results"><h1 align="center">Classifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><h2>Ultimo salvataggio globale: '+lastsavetime+'</h2><table border="1"><tr><th>Posizione</th><th>Nome utente</th><th>Punteggio</th><th>Ultimo salvataggio</th>';
+	var contestCSV = '"Nome utente";"Posizione";"Punteggio";"Ultimo salvataggio"\n';
+	contestProblems.forEach(function(currproblem){
+		if (currproblem.testcases.length > 0) {
+			contestTableHtml += '<th class="prob">' + sanitizer.escape(String(currproblem.name)) + '</th>';
+		}
+	});
+	contestTableHtml += '</tr>';
+	Object.keys(userTimestamps).sort(function(a, b){
+		if (userPoints[a] != userPoints[b]) {
+			return userPoints[b] - userPoints[a];
+		}
+		if (!isNaN(userTimestamps[a]) && !isNaN(userTimestamps[b])) {
+			return userTimestamps[a] - userTimestamps[b];
+		}
+		if (isNaN(userTimestamps[a]) && !isNaN(userTimestamps[b])) {
+			return b;
+		}
+		if (isNaN(userTimestamps[b]) && !isNaN(userTimestamps[a])) {
+			return a;
+		}
+		return a < b ? -1 : 1;
+	}).forEach(function(currusername, j){
+		contestTableHtml += '<tr><td>'+(j+1)+'°</td><td><a href="'+sanitizer.escape(String(currusername))+'">'+sanitizer.escape(String(currusername))+'</a></td><td>'+userPoints[currusername]+'</td><td>'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'</td>';
+		contestCSV += '"' + sanitizer.escape(String(currusername)) + '","'+(j+1)+'","'+userPoints[currusername]+'","'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'"\n';
 		contestProblems.forEach(function(currproblem){
 			if (currproblem.testcases.length > 0) {
-				contestTableHtml += '<th class="prob">' + sanitizer.escape(String(currproblem.name)) + '</th>';
+				contestTableHtml += '<td class="prob ' + (currproblem.userdata[currusername].success ? 'green' : (currproblem.userdata[currusername].successcount > 0 ? 'yellow' : 'red')) + '">' + currproblem.userdata[currusername].successcount + '/' + currproblem.testcases.length + '</td>';
 			}
 		});
 		contestTableHtml += '</tr>';
-		Object.keys(userTimestamps).sort(function(a, b){
-			if (userPoints[a] != userPoints[b]) {
-				return userPoints[b] - userPoints[a];
-			}
-			if (!isNaN(userTimestamps[a]) && !isNaN(userTimestamps[b])) {
-				return userTimestamps[a] - userTimestamps[b];
-			}
-			if (isNaN(userTimestamps[a]) && !isNaN(userTimestamps[b])) {
-				return b;
-			}
-			if (isNaN(userTimestamps[b]) && !isNaN(userTimestamps[a])) {
-				return a;
-			}
-			return a < b ? -1 : 1;
-		}).forEach(function(currusername, j){
-			contestTableHtml += '<tr><td>'+(j+1)+'°</td><td><a href="'+sanitizer.escape(String(currusername))+'">'+sanitizer.escape(String(currusername))+'</a></td><td>'+userPoints[currusername]+'</td><td>'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'</td>';
-			contestCSV += '"' + sanitizer.escape(String(currusername)) + '","'+(j+1)+'","'+userPoints[currusername]+'","'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'"\n';
-			contestProblems.forEach(function(currproblem){
-				if (currproblem.testcases.length > 0) {
-					contestTableHtml += '<td class="prob ' + (currproblem.userdata[currusername].success ? 'green' : (currproblem.userdata[currusername].successcount > 0 ? 'yellow' : 'red')) + '">' + currproblem.userdata[currusername].successcount + '/' + currproblem.testcases.length + '</td>';
-				}
-			});
-			contestTableHtml += '</tr>';
-		});
-		contestTableHtml += '</table></div>';
-
-		fs.writeFileSync(path.join(resultsDirName, 'index.html'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Competition Results</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode displayresults">' + contestTableHtml + '</body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
-		fs.writeFileSync(path.join(resultsDirName, 'index.csv'), contestCSV);
-
-		console.log('Results written into ' + resultsDirName);
 	});
+	contestTableHtml += '</table></div>';
+
+	fs.writeFileSync(path.join(resultsDirName, 'index.html'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Competition Results</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode displayresults">' + contestTableHtml + '</body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
+	fs.writeFileSync(path.join(resultsDirName, 'index.csv'), contestCSV);
+
+	console.log('Results written into ' + resultsDirName);
 });

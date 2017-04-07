@@ -58,11 +58,7 @@ npm install async express@3.5.1 sanitizer sqlite3
 
 (The server isn't compatible with express 4.x for now.)
 
-After you've done with the prerequisites, first create the database by editing and running the file:
-
-```
-node server/init_contest_database.sample.js
-```
+You can now configure the server by copying the skeleton configuration from `server/config.sample.js` to `server/config.js`, and adding users, problems and testcases as needed.
 
 To start the contest server run:
 
@@ -70,15 +66,7 @@ To start the contest server run:
 node server/server.js
 ```
 
-To start the admin server run:
-
-```
-node server/admin.js
-```
-
-You can configure the servers parameters in `server/config.js`.
-The contest server listens by default on `0.0.0.0:8081`, and the admin server on `0.0.0.0:8082`.
-The admin server default credentials are `admin:admin`.
+The contest server listens by default on `0.0.0.0:8081`.
 
 To generate the contest result pages run:
 
@@ -88,7 +76,7 @@ node server/build_results.js
 
 You'll find them in `server/results/GENERATION_TIMESTAMP`.
 
-You can use the `sqlite3` utility directly on the database, until a proper admin interface is implemented. :P
+You can use the `sqlite3` utility directly on the database to edit user-submitted data, if needed.
 
 ```
 sqlite3 server/database.sqlite
@@ -96,7 +84,6 @@ sqlite3 server/database.sqlite
 
 ## TODO
 
-- Contest admin interface interactivity (to add problems, users and testcases on-the-fly)
 - htaccess and htpasswd generation in server/build_results.js
 
 Any suggestion? Please create an issue or a pull request, or drop me a line at `vittgam {at} turingsimulator {dot} net`. Thanks!

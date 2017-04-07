@@ -19,10 +19,8 @@ var express = require('express');
 var async = require('async');
 
 var dbname = path.join(__dirname, 'database.sqlite');
-if (!fs.existsSync(dbname)) {
-	throw new Error('No database! Please use the file init_contest_database.sample.js as a start to create a new database.');
-}
 var db = new sqlite3.Database(dbname);
+db.run('CREATE TABLE IF NOT EXISTS userdata (id TEXT NOT NULL, username TEXT NOT NULL, code TEXT, timestamp INT)');
 
 var licenseText = fs.readFileSync(path.join(__dirname, 'LICENSE'));
 var cssStyle = fs.readFileSync(path.join(__dirname, '..', 'lib', 'style.css'));
@@ -54,13 +52,11 @@ var userapp = express();
 userapp.listen(serverConfig.contestServer.bindPort, serverConfig.contestServer.bindHost);
 userapp.use(express.logger('[user]  :remote-addr :req[x-real-ip-ok] - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
 userapp.use(express.basicAuth(function(username, password, callback){
-	db.get('SELECT username, password FROM users WHERE username = ? AND password = ?', username, password, function(err, row){
-		if (!err && row && row.username === username && row.password === password) {
-			callback(null, username);
-		} else {
-			callback(true, null);
-		}
-	});
+	if (username && password && serverConfig.users[username] === password) {
+		callback(null, username);
+	} else {
+		callback(true, null);
+	}
 }, serverConfig.contestServer.authRealm));
 
 userapp.get('/', function(req, res){
@@ -73,26 +69,18 @@ userapp.get('/jstmsimulator.gif', function(req, res){
 });
 
 userapp.get('/ajax/init', function(req, res){
-	db.all('SELECT id, name FROM problems', function(err, rows){
-		if (!err && rows) {
-			res.json({success: true, username: req.user, contestProblems: rows});
-		} else {
-			res.json({success: false});
-		}
+	var ret = {success: true, username: req.user, contestProblems: []};
+	Object.keys(serverConfig.problems).forEach(function(i){
+		ret.contestProblems.push({id: i, name: serverConfig.problems[i][0]});
 	});
+	res.json(ret);
 });
 
 userapp.get('/ajax/problem/:problemid', function(req, res){
-	if (req.params && req.params.problemid) {
-		db.get('SELECT id, name FROM problems WHERE id = ?', req.params.problemid, function(err, row){
-			if (!err && row && row.id === req.params.problemid) {
-				db.get('SELECT code FROM userdata WHERE id = ? AND username = ? ORDER BY timestamp DESC LIMIT 0,1', req.params.problemid, req.user, function(err, row2){
-					if (!err) {
-						res.json({success: true, code: (row2 && row2.code) || getEmptyCode(req.params.problemid, row.name)});
-					} else {
-						res.json({success: false});
-					}
-				});
+	if (req.params && req.params.problemid && serverConfig.problems[req.params.problemid]) {
+		db.get('SELECT code FROM userdata WHERE id = ? AND username = ? ORDER BY timestamp DESC LIMIT 0,1', req.params.problemid, req.user, function(err, row){
+			if (!err) {
+				res.json({success: true, code: (row && row.code) || getEmptyCode(req.params.problemid, serverConfig.problems[req.params.problemid][0])});
 			} else {
 				res.json({success: false});
 			}
@@ -103,21 +91,15 @@ userapp.get('/ajax/problem/:problemid', function(req, res){
 });
 
 userapp.post('/ajax/problem/:problemid', function(req, res){
-	if (req.params && req.params.problemid && req.is('text/plain')) {
+	if (req.params && req.params.problemid && serverConfig.problems[req.params.problemid] && req.is('text/plain')) {
 		var rawBody = '';
 		req.setEncoding('utf8');
 		req.on('data', function(chunk){
 			rawBody += chunk;
 		});
 		req.on('end', function(){
-			db.get('SELECT id FROM problems WHERE id = ?', req.params.problemid, function(err, row){
-				if (!err && row && row.id === req.params.problemid) {
-					db.run('INSERT INTO userdata VALUES (?, ?, ?, ?)', req.params.problemid, req.user, rawBody || '', +(new Date()), function(err){
-						res.json({success: !err});
-					});
-				} else {
-					res.json({success: false});
-				}
+			db.run('INSERT INTO userdata VALUES (?, ?, ?, ?)', req.params.problemid, req.user, rawBody || '', +(new Date()), function(err){
+				res.json({success: !err});
 			});
 		});
 	} else {
