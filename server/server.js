@@ -50,7 +50,7 @@ try {
 
 var userapp = express();
 userapp.listen(serverConfig.contestServer.bindPort, serverConfig.contestServer.bindHost);
-userapp.use(express.logger('[user]  :remote-addr :req[x-real-ip-ok] - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
+userapp.use(express.logger(':remote-addr :req[x-real-ip-ok] - ":user" [:date] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" ":req[host]"'));
 userapp.use(express.basicAuth(function(username, password, callback){
 	if (username && password && serverConfig.users[username] === password) {
 		callback(null, username);
