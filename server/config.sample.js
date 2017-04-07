@@ -14,6 +14,11 @@ var serverConfig = {
 		bindPort: 8081,
 		authRealm: 'Benvenuto alla Gara di programmazione della Macchina di Turing; inserisci le tue credenziali di accesso per continuare',
 	},
+	results: {
+		maxSteps: 100000,
+		startFromZero: false,
+		authRealm: 'Correzione dei problemi della Gara di programmazione della Macchina di Turing',
+	},
 	users: {
 		'testuser1': 'testpass1',
 		'testuser2': 'testpass2',
@@ -37,5 +42,4 @@ var serverConfig = {
 			'S': '0',
 		}],
 	},
-	maxSteps: 100000,
 };

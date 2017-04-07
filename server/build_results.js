@@ -137,7 +137,7 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 					}
 				});
 				currtestcase.instance.start();
-				while (currtestcase.instance.stepcount <= serverConfig.maxSteps && currtestcase.instance.tick());
+				while (currtestcase.instance.stepcount <= serverConfig.results.maxSteps && currtestcase.instance.tick());
 				currtestcase.steps = currtestcase.instance.stepcount;
 				currtestcase.endstate = currtestcase.instance.currstate;
 				currtestcase.finaltape = String(currtestcase.instance.tapetext).replace(new RegExp('^ *(.*?) *$'), '$1');
@@ -145,7 +145,7 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 				if (curruserproblem.error) {
 					return true;
 				}
-				if (currtestcase.outcome !== 'Run' && currtestcase.steps > serverConfig.maxSteps) {
+				if (currtestcase.outcome !== 'Run' && currtestcase.steps > serverConfig.results.maxSteps) {
 					console.log('Timeout!');
 					currtestcase.outcome = 'Timeout';
 				} else if (currtestcase.outcome === 'Run' && currtestcase.finaltape === currtestcase.expectedtape) {
@@ -216,7 +216,7 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 
 		userPoints[currusername] = points;
 
-		// TODO creare htpasswd e htaccess qui. l'username sta in currusername e la password sta in serverConfig.users[currusername]
+		// TODO creare htpasswd e htaccess qui. il realm sta in serverConfig.results.authRealm, l'username sta in currusername e la password sta in serverConfig.users[currusername]
 
 		console.log('');
 	});
@@ -246,8 +246,11 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 		}
 		return a < b ? -1 : 1;
 	}).forEach(function(currusername, j){
-		contestTableHtml += '<tr><td>'+(j+1)+'°</td><td><a href="'+sanitizer.escape(String(currusername))+'">'+sanitizer.escape(String(currusername))+'</a></td><td>'+userPoints[currusername]+'</td><td>'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'</td>';
-		contestCSV += '"' + sanitizer.escape(String(currusername)) + '","'+(j+1)+'","'+userPoints[currusername]+'","'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'"\n';
+		if (!serverConfig.results.startFromZero) {
+			j++;
+		}
+		contestTableHtml += '<tr><td>'+j+'°</td><td><a href="'+sanitizer.escape(String(currusername))+'">'+sanitizer.escape(String(currusername))+'</a></td><td>'+userPoints[currusername]+'</td><td>'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'</td>';
+		contestCSV += '"' + sanitizer.escape(String(currusername)) + '","'+j+'","'+userPoints[currusername]+'","'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'"\n';
 		Object.keys(contestProblems).forEach(function(currproblemid){
 			var currproblem = contestProblems[currproblemid];
 			if (currproblem.testcases.length > 0) {
