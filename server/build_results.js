@@ -56,62 +56,60 @@ fs.mkdirSync(resultsDirName);
 console.log('Output dir: ' + resultsDirName);
 console.log('');
 
-db.serialize();
-var contestProblems = [];
-Object.keys(serverConfig.problems).forEach(function(i){ // FIXME!!!
-	contestProblems.push({id: i, name: serverConfig.problems[i][0], points: serverConfig.problems[i][1]});
-});
-var problemMap = {};
+var contestProblems = {};
 var userTimestamps = {};
 var lastTimestamp = null;
 var userPoints = {};
-contestProblems.forEach(function(i, j){
-	problemMap[i.id] = j;
-	i.testcases = [];
-	i.userdata = {};
-});
-Object.keys(serverConfig.testcases).forEach(function(i){ // FIXME!!!
-	if (!(typeof problemMap[i] === 'number' && contestProblems[problemMap[i]])) {
-		throw new Error('select testcases failed');
-	}
-	serverConfig.testcases[i].forEach(function(j){
-		contestProblems[problemMap[i]].testcases.push({
-			initialtape: String(j[0]).toUpperCase(),
-			expectedtape: String(j[1]).toUpperCase().replace(new RegExp('^ *(.*?) *$'), '$1')
+
+Object.keys(serverConfig.problems).forEach(function(i){
+	var obj = {
+		name: serverConfig.problems[i][0],
+		points: serverConfig.problems[i][1],
+		testcases: [],
+		userdata: {},
+	};
+	if (serverConfig.problems[i][2]) {
+		Object.keys(serverConfig.problems[i][2]).forEach(function(j){
+			obj.testcases.push({
+				initialtape: String(j).toUpperCase(),
+				expectedtape: String(serverConfig.problems[i][2][j]).toUpperCase().replace(new RegExp('^ *(.*?) *$'), '$1'),
+			});
 		});
-	});
+	}
+	contestProblems[i] = obj;
 });
+
+db.serialize();
 db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp DESC', function(err, curruserdata){
-	if (!(!err && curruserdata && typeof problemMap[curruserdata.id] === 'number' && contestProblems[problemMap[curruserdata.id]])) {
+	if (!(!err && curruserdata)) {
 		throw new Error('select userdata failed');
 	}
-	if (!contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username]) {
+	if (contestProblems[curruserdata.id] && !contestProblems[curruserdata.id].userdata[curruserdata.username]) {
 		if (!userTimestamps[curruserdata.username]) {
 			userTimestamps[curruserdata.username] = curruserdata.timestamp;
 		}
 		if (!lastTimestamp) {
 			lastTimestamp = curruserdata.timestamp;
 		}
-		contestProblems[problemMap[curruserdata.id]].userdata[curruserdata.username] = {code: curruserdata.code};
+		contestProblems[curruserdata.id].userdata[curruserdata.username] = {code: curruserdata.code};
 	}
 }, function(){
-	Object.keys(serverConfig.users).forEach(function(i){
-		var row = {username: i, password: serverConfig.users[i]}; // FIXME!!!
-
-		if (!userTimestamps.hasOwnProperty(row.username)) {
+	Object.keys(serverConfig.users).forEach(function(currusername){
+		if (!userTimestamps.hasOwnProperty(currusername)) {
 			return;
 		}
 
 		var points = 0;
-		contestProblems.forEach(function(currproblem){
+		Object.keys(contestProblems).forEach(function(currproblemid){
+			var currproblem = contestProblems[currproblemid];
 			if (currproblem.testcases.length < 1) {
 				return;
 			}
-			console.log('Evaluating problem "' + currproblem.id + '" for user "' + row.username + '"...');
-			if (!currproblem.userdata[row.username]) {
-				currproblem.userdata[row.username] = {code: getEmptyCode(currproblem.id, currproblem.name)};
+			console.log('Evaluating problem "' + currproblemid + '" for user "' + currusername + '"...');
+			if (!currproblem.userdata[currusername]) {
+				currproblem.userdata[currusername] = {code: getEmptyCode(currproblemid, currproblem.name)};
 			}
-			var curruserproblem = currproblem.userdata[row.username];
+			var curruserproblem = currproblem.userdata[currusername];
 			curruserproblem.success = false;
 			curruserproblem.error = false;
 			curruserproblem.testcases = [];
@@ -139,7 +137,7 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 					}
 				});
 				currtestcase.instance.start();
-				while (currtestcase.instance.stepcount <= serverConfig.maxsteps && currtestcase.instance.tick());
+				while (currtestcase.instance.stepcount <= serverConfig.maxSteps && currtestcase.instance.tick());
 				currtestcase.steps = currtestcase.instance.stepcount;
 				currtestcase.endstate = currtestcase.instance.currstate;
 				currtestcase.finaltape = String(currtestcase.instance.tapetext).replace(new RegExp('^ *(.*?) *$'), '$1');
@@ -147,7 +145,7 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 				if (curruserproblem.error) {
 					return true;
 				}
-				if (currtestcase.outcome !== 'Run' && currtestcase.steps > serverConfig.maxsteps) {
+				if (currtestcase.outcome !== 'Run' && currtestcase.steps > serverConfig.maxSteps) {
 					console.log('Timeout!');
 					currtestcase.outcome = 'Timeout';
 				} else if (currtestcase.outcome === 'Run' && currtestcase.finaltape === currtestcase.expectedtape) {
@@ -163,34 +161,35 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 				}
 			}
 		});
-		//console.dir(contestProblems);
 
-		var lastsavedate = new Date(userTimestamps[row.username]);
+		var lastsavedate = new Date(userTimestamps[currusername]);
 		var lastsavetime = getLastSaveTime(lastsavedate);
-		var contestTableHtml = '<div id="results"><h1 align="center">Verifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><p>Per provare usare il <a href="#simulator">simulatore</a> pre-caricato con i problemi della squadra \'<i>'+sanitizer.escape(String(row.username))+'</i>\'.</p><h2>Sommario ('+points+' punt'+(points === 1 ? 'o' : 'i')+', ultimo salvataggio '+lastsavetime+')</h2><table border="1"><tr><th>Problem</th><th>Points</th><th>Result</th><th>Count</th></tr>';
-		contestProblems.forEach(function(currproblem){
+		var contestTableHtml = '<div id="results"><h1 align="center">Verifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><p>Per provare usare il <a href="#simulator">simulatore</a> pre-caricato con i problemi della squadra \'<i>'+sanitizer.escape(String(currusername))+'</i>\'.</p><h2>Sommario ('+points+' punt'+(points === 1 ? 'o' : 'i')+', ultimo salvataggio '+lastsavetime+')</h2><table border="1"><tr><th>Problem</th><th>Points</th><th>Result</th><th>Count</th></tr>';
+		Object.keys(contestProblems).forEach(function(currproblemid){
+			var currproblem = contestProblems[currproblemid];
 			contestTableHtml += '<tr><td><a';
 			if (currproblem.testcases.length > 0) {
-				contestTableHtml += ' href="#'+sanitizer.escape(String(currproblem.id))+'"';
+				contestTableHtml += ' href="#'+sanitizer.escape(String(currproblemid))+'"';
 			}
-			contestTableHtml += '>'+sanitizer.escape(String(currproblem.name))+'</a> (<a href="progs/'+sanitizer.escape(String(currproblem.id))+'.t">download</a>)</td>';
+			contestTableHtml += '>'+sanitizer.escape(String(currproblem.name))+'</a> (<a href="progs/'+sanitizer.escape(String(currproblemid))+'.t">download</a>)</td>';
 			if (currproblem.testcases.length > 0) {
 				contestTableHtml += '<td>' + currproblem.points + '</td>';
-				var xcolor = (currproblem.userdata[row.username].success ? 'green' : (currproblem.userdata[row.username].successcount > 0 ? 'yellow' : 'red'));
-				contestTableHtml += '<td class="' + xcolor + '">' + (currproblem.userdata[row.username].success ? 'OK' : 'FAIL') + '</td>';
-				contestTableHtml += '<td class="' + xcolor + '">' + currproblem.userdata[row.username].successcount + '/' + currproblem.testcases.length + '</td>';
+				var xcolor = (currproblem.userdata[currusername].success ? 'green' : (currproblem.userdata[currusername].successcount > 0 ? 'yellow' : 'red'));
+				contestTableHtml += '<td class="' + xcolor + '">' + (currproblem.userdata[currusername].success ? 'OK' : 'FAIL') + '</td>';
+				contestTableHtml += '<td class="' + xcolor + '">' + currproblem.userdata[currusername].successcount + '/' + currproblem.testcases.length + '</td>';
 			} else {
 				contestTableHtml += '<td>N/A</td><td>N/A</td><td>N/A</td>';
 			}
 			contestTableHtml += '</tr>';
 		});
 		contestTableHtml += '</table>';
-		contestProblems.forEach(function(currproblem){
+		Object.keys(contestProblems).forEach(function(currproblemid){
+			var currproblem = contestProblems[currproblemid];
 			if (currproblem.testcases.length < 1) {
 				return;
 			}
-			var curruserproblem = currproblem.userdata[row.username];
-			contestTableHtml += '<h2><a name="'+sanitizer.escape(String(currproblem.id))+'">'+sanitizer.escape(String(currproblem.name))+'</a> ('+currproblem.points+' punt'+(currproblem.points === 1 ? 'o' : 'i')+')</h2><table border="1"><tr><th>Outcome</th><th>Input</th><th>Output</th><th>Atteso</th><th>Passi</th><th>Risultato</th></tr>';
+			var curruserproblem = currproblem.userdata[currusername];
+			contestTableHtml += '<h2><a name="'+sanitizer.escape(String(currproblemid))+'">'+sanitizer.escape(String(currproblem.name))+'</a> ('+currproblem.points+' punt'+(currproblem.points === 1 ? 'o' : 'i')+')</h2><table border="1"><tr><th>Outcome</th><th>Input</th><th>Output</th><th>Atteso</th><th>Passi</th><th>Risultato</th></tr>';
 			if (curruserproblem.error) {
 				contestTableHtml += '<tr><td colspan="6" style="color:#f00">'+sanitizer.escape(String((curruserproblem.error.errorType === 'syntax' ? String(currlang.SYNTAX_ERROR_LABEL).replace('%d', curruserproblem.error.errorLine + 1) : currlang.UNKNOWN_ERROR_LABEL) + ' ' + currlang[curruserproblem.error.errorMessage]))+'</td></tr>';
 			} else {
@@ -200,23 +199,24 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 			}
 			contestTableHtml += '</table>';
 		});
-		contestTableHtml += '<h2 align="center"><a name="simulator">Simulatore pre-caricato con i problemi della squadra \'<i>'+sanitizer.escape(String(row.username))+'</i>\'</a></h2></div>';
+		contestTableHtml += '<h2 align="center"><a name="simulator">Simulatore pre-caricato con i problemi della squadra \'<i>'+sanitizer.escape(String(currusername))+'</i>\'</a></h2></div>';
 
-		fs.mkdirSync(path.join(resultsDirName, row.username));
-		fs.mkdirSync(path.join(resultsDirName, row.username, 'progs'));
+		fs.mkdirSync(path.join(resultsDirName, currusername));
+		fs.mkdirSync(path.join(resultsDirName, currusername, 'progs'));
 
 		var preloadedProblems = [];
-		contestProblems.forEach(function(currproblem){
-			var currcode = (currproblem.userdata[row.username] ? currproblem.userdata[row.username].code : getEmptyCode(currproblem.id, currproblem.name));
+		Object.keys(contestProblems).forEach(function(currproblemid){
+			var currproblem = contestProblems[currproblemid];
+			var currcode = (currproblem.userdata[currusername] ? currproblem.userdata[currusername].code : getEmptyCode(currproblemid, currproblem.name));
 			preloadedProblems.push({name: currproblem.name, code: currcode});
-			fs.writeFileSync(path.join(resultsDirName, row.username, 'progs', currproblem.id + '.t'), currcode);
+			fs.writeFileSync(path.join(resultsDirName, currusername, 'progs', currproblemid + '.t'), currcode);
 		});
-		fs.writeFileSync(path.join(resultsDirName, row.username, 'index.html'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Competition Results</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode displayresults">' + contestTableHtml + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + handleHTMLPageJS + 'var preloadedProblems = '+JSON.stringify(preloadedProblems)+';' + handlePreloadedProblemsJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
-		fs.writeFileSync(path.join(resultsDirName, row.username, 'jstmsimulator.gif'), jstmsimulatorGif);
+		fs.writeFileSync(path.join(resultsDirName, currusername, 'index.html'), ('<!doctype html>\n<!-- saved from url=(0014)about:internet -->\n<!--\n' + licenseText + '--><html class="notranslate"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Turing Machine Competition Results</title>' + htmlheadHtml + '<style>' + uglifycss(String(cssStyle)) + '</style>' + iecsshacksHtml + '</head><body class="loadmode displayresults">' + contestTableHtml + turingMachineHtml + '<script>' + uglifyjs.minify('(function(){' + turingMachineJS + i18nJS + handleHTMLPageJS + 'var preloadedProblems = '+JSON.stringify(preloadedProblems)+';' + handlePreloadedProblemsJS + '})();', {fromString: true}).code + '</script></body></html>').replace(new RegExp('(?:\\r\\n|\\n|\\r)', 'g'), '\r\n')); // just another IE 6 fix
+		fs.writeFileSync(path.join(resultsDirName, currusername, 'jstmsimulator.gif'), jstmsimulatorGif);
 
-		userPoints[row.username] = points;
+		userPoints[currusername] = points;
 
-		// TODO creare htpasswd e htaccess qui. l'username sta in row.username e la password sta in row.password
+		// TODO creare htpasswd e htaccess qui. l'username sta in currusername e la password sta in serverConfig.users[currusername]
 
 		console.log('');
 	});
@@ -224,7 +224,8 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 	var lastsavetime = getLastSaveTime(lastsavedate);
 	var contestTableHtml = '<div id="results"><h1 align="center">Classifica della gara del '+lastsavedate.getDate()+'/'+(lastsavedate.getMonth()+1)+'/'+lastsavedate.getFullYear()+'</h1><h2>Ultimo salvataggio globale: '+lastsavetime+'</h2><table border="1"><tr><th>Posizione</th><th>Nome utente</th><th>Punteggio</th><th>Ultimo salvataggio</th>';
 	var contestCSV = '"Nome utente";"Posizione";"Punteggio";"Ultimo salvataggio"\n';
-	contestProblems.forEach(function(currproblem){
+	Object.keys(contestProblems).forEach(function(currproblemid){
+		var currproblem = contestProblems[currproblemid];
 		if (currproblem.testcases.length > 0) {
 			contestTableHtml += '<th class="prob">' + sanitizer.escape(String(currproblem.name)) + '</th>';
 		}
@@ -247,7 +248,8 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 	}).forEach(function(currusername, j){
 		contestTableHtml += '<tr><td>'+(j+1)+'°</td><td><a href="'+sanitizer.escape(String(currusername))+'">'+sanitizer.escape(String(currusername))+'</a></td><td>'+userPoints[currusername]+'</td><td>'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'</td>';
 		contestCSV += '"' + sanitizer.escape(String(currusername)) + '","'+(j+1)+'","'+userPoints[currusername]+'","'+sanitizer.escape(String(getLastSaveTime(new Date(userTimestamps[currusername]))))+'"\n';
-		contestProblems.forEach(function(currproblem){
+		Object.keys(contestProblems).forEach(function(currproblemid){
+			var currproblem = contestProblems[currproblemid];
 			if (currproblem.testcases.length > 0) {
 				contestTableHtml += '<td class="prob ' + (currproblem.userdata[currusername].success ? 'green' : (currproblem.userdata[currusername].successcount > 0 ? 'yellow' : 'red')) + '">' + currproblem.userdata[currusername].successcount + '/' + currproblem.testcases.length + '</td>';
 			}
