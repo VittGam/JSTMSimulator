@@ -19,6 +19,26 @@ if (contestProblems) {
 		codeTextarea.readOnly = inputBox.disabled = speedSelect.disabled = startBtn.disabled = progsSelect.disabled = loadBtn.disabled = saveBtn.disabled = false;
 	};
 
+	// XXX: do we really still need to support IE 6 in 2017?
+	var needcancelalertstatus = false;
+	var needcancelalertstatusfunc = function(){
+		if (needcancelalertstatus) {
+			needcancelalertstatus = false;
+			setstatus('');
+		}
+	};
+	addEvent(document.documentElement, 'mousedown', needcancelalertstatusfunc);
+	addEvent(document.documentElement, 'keydown', needcancelalertstatusfunc);
+
+	var alertstatus = function(text) {
+		setstatus('');
+		var asd = document.createElement('span');
+		asd.style.color = '#ff0';
+		setTextContent(asd, text);
+		statusDiv.appendChild(asd);
+		needcancelalertstatus = true;
+	};
+
 	addEvent(loadBtn, 'click', function(){
 		var curridx = progsSelect.selectedIndex;
 		// always ask for confirmation even if codeTextarea.value === '', so the user can still cancel and ctrl-z after deleting everything
@@ -27,7 +47,7 @@ if (contestProblems) {
 			xmlhttp('ajax/problem/' + encodeURIComponent(contestProblems[curridx].id) + '?_r=' + encodeURIComponent(+(new Date())), null, function(success, response){
 				if (success && response && response.success) {
 					codeTextarea.value = response.code || '';
-					alert(currlang.LOAD_RESULT_OK);
+					alertstatus(currlang.LOAD_RESULT_OK);
 				} else {
 					alert(currlang.LOAD_RESULT_FAIL);
 				}
@@ -42,7 +62,7 @@ if (contestProblems) {
 			disableInputs();
 			xmlhttp('ajax/problem/' + encodeURIComponent(contestProblems[curridx].id) + '?_r=' + encodeURIComponent(+(new Date())), codeTextarea.value.replace(new RegExp('(?:\r\n|\r)', 'g'), '\n'), function(success, response){
 				if (success && response && response.success) {
-					alert(currlang.SAVE_RESULT_OK);
+					alertstatus(currlang.SAVE_RESULT_OK);
 				} else {
 					alert(currlang.SAVE_RESULT_FAIL);
 				}
