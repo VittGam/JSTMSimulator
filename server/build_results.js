@@ -69,11 +69,11 @@ Object.keys(serverConfig.problems).forEach(function(i){
 		userdata: {},
 	};
 	if (serverConfig.problems[i][2]) {
-		Object.keys(serverConfig.problems[i][2]).forEach(function(j){
-			obj.testcases.push({
-				initialtape: String(j).toUpperCase(),
-				expectedtape: String(serverConfig.problems[i][2][j]).toUpperCase().replace(new RegExp('^ *(.*?) *$'), '$1'),
-			});
+		serverConfig.problems[i][2].forEach(function(j){
+			obj.testcases.push([
+				String(j[0]).toUpperCase(),
+				String(j[1]).toUpperCase().replace(new RegExp('^ *(.*?) *$'), '$1'),
+			]);
 		});
 	}
 	contestProblems[i] = obj;
@@ -116,8 +116,8 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 			curruserproblem.successcount = 0;
 			currproblem.testcases.some(function(currrawproblem){
 				var currtestcase = [];
-				currtestcase.initialtape = currrawproblem.initialtape;
-				currtestcase.expectedtape = currrawproblem.expectedtape;
+				currtestcase.initialtape = currrawproblem[0];
+				currtestcase.expectedtape = currrawproblem[1];
 				currtestcase.outcome = 'Not Run';
 				currtestcase.steps = 0;
 				currtestcase.endstate = '';
