@@ -2,7 +2,7 @@
 
 A Turing Machine simulator written in JavaScript. It should work on Chrome and Firefox, as well as IE 6 through 10. Testing by the developer is usually done on Firefox and IE 6.
 
-This simulator has been written from scratch and it's based on the design and functionality of the Java simulator developed by Antonio Cisternino (http://mdt.di.unipi.it/TMSimulatore/TMSimulator-1.2.zip).
+This simulator has been written from scratch by Vittorio Gambaletta. It is based on the graphic design and syntax of the older Java simulator developed by Prof. Antonio Cisternino (http://mdt.di.unipi.it/TMSimulatore/TMSimulator-1.2.zip).
 
 For the machine syntax, I'm going to write it in the wiki. In the meantime, please refer to the documentation contained in the zip file of the original Java version (in Italian).
 

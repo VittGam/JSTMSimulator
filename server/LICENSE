@@ -1,17 +1,15 @@
-JSTMSimulator - A Turing Machine simulator written in JavaScript.
-Copyright (C) 2017 VittGam.net. All Rights Reserved.
+JSTMSimulator Server - A Turing Machine competition server written in JavaScript.
+Copyright (C) 2011-2018 Vittorio Gambaletta <vittgam@turingsimulator.net>
 https://www.turingsimulator.net/
 
 See https://www.turingsimulator.net/github for source code.
 
 
-JSTMSimulator is licensed under the MIT license.
+JSTMSimulator Server is licensed under the MIT license.
 
 This product includes JSON3 code (https://bestiejs.github.io/json3/) that
 is Copyright (C) 2015 Kit Cambridge and is also licensed under the MIT license.
 
-
-The MIT license text follows:
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

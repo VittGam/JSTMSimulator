@@ -1,5 +1,5 @@
 JSTMSimulator - A Turing Machine simulator written in JavaScript.
-Copyright (C) 2017 VittGam.net. All Rights Reserved.
+Copyright (C) 2011-2018 Vittorio Gambaletta <vittgam@turingsimulator.net>
 https://www.turingsimulator.net/
 
 See https://www.turingsimulator.net/github for source code.
@@ -7,7 +7,6 @@ See https://www.turingsimulator.net/github for source code.
 
 JSTMSimulator is licensed under the MIT license.
 
-The MIT license text follows:
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
