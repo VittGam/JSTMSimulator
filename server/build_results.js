@@ -231,7 +231,10 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 		}
 	});
 	contestTableHtml += '</tr>';
-	Object.keys(userTimestamps).sort(function(a, b){
+
+	Object.keys(serverConfig.users).filter(function(currusername){
+		return !!userTimestamps.hasOwnProperty(currusername);
+	}).sort(function(a, b){
 		if (userPoints[a] != userPoints[b]) {
 			return userPoints[b] - userPoints[a];
 		}
