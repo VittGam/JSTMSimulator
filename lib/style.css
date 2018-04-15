@@ -59,7 +59,7 @@ body.displayresults #main {
 	text-align: center;
 	font-size: 32px;
 	font-weight: bold;
-	white-space: nowrap;
+	white-space: pre;
 	z-index: 1;
 }
 #code {
