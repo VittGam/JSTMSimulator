@@ -94,7 +94,7 @@ userapp.get('/ajax/problem/:problemid', function(req, res){
 	if (req.params && req.params.problemid && serverConfig.problems[req.params.problemid]) {
 		db.get('SELECT code FROM userdata WHERE id = ? AND username = ? ORDER BY timestamp DESC LIMIT 0,1', req.params.problemid, req.user, function(err, row){
 			if (!err) {
-				res.json({success: true, code: (row && row.code) || getEmptyCode(req.params.problemid, serverConfig.problems[req.params.problemid][0])});
+				res.json({success: true, code: (row && row.code) ? String(row.code) : getEmptyCode(req.params.problemid, serverConfig.problems[req.params.problemid][0])});
 			} else {
 				res.json({success: false});
 			}

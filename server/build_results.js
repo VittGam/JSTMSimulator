@@ -91,7 +91,7 @@ db.each('SELECT id, username, code, timestamp FROM userdata ORDER BY timestamp D
 		if (!lastTimestamp) {
 			lastTimestamp = curruserdata.timestamp;
 		}
-		contestProblems[curruserdata.id].userdata[curruserdata.username] = {code: curruserdata.code};
+		contestProblems[curruserdata.id].userdata[curruserdata.username] = {code: String(curruserdata.code)};
 	}
 }, function(){
 	Object.keys(serverConfig.users).forEach(function(currusername){
